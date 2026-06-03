@@ -99,10 +99,20 @@ create policy "Public can read active businesses"
   on businesses for select
   using (is_active = true);
 
+-- Businesses: authenticated users can insert (for signup)
+create policy "Users can insert businesses"
+  on businesses for insert
+  with check (auth.role() = 'authenticated');
+
 -- Profiles: users can read own
 create policy "Users can read own profile"
   on profiles for select
   using (id = auth.uid());
+
+-- Profiles: users can insert own profile (for signup)
+create policy "Users can insert own profile"
+  on profiles for insert
+  with check (id = auth.uid());
 
 -- Bookings: business members can read
 create policy "Business members can read bookings"
