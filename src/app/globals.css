@@ -207,6 +207,15 @@
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.06), 0 4px 20px rgba(10, 110, 116, 0.08);
 }
 
+/* Hide scrollbar for carousel */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 /* Stats Bar */
 .stat-item {
   text-align: center;

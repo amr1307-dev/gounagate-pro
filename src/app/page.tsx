@@ -42,12 +42,12 @@ export default function LandingPage() {
           <div className="relative max-w-5xl mx-auto">
             {/* SVG connecting lines */}
             <svg className="absolute inset-0 w-full h-full pointer-events-none z-0 hidden md:block" viewBox="0 0 1000 400" preserveAspectRatio="xMidYMid meet">
-              <path d="M 280 180 Q 500 80 720 180" fill="none" stroke="#0A6E74" strokeWidth="2" strokeDasharray="8 6" opacity="0.3" />
+              <path d="M 270 200 Q 500 60 730 200" fill="none" stroke="#065256" strokeWidth="2.5" strokeDasharray="8 6" opacity="0.5" />
             </svg>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 relative z-10">
+            <div className="flex md:grid md:grid-cols-3 gap-6 md:gap-8 relative z-10 overflow-x-auto snap-x snap-mandatory md:overflow-visible pb-4 md:pb-0 scrollbar-hide">
               {/* Card 1: Phone mockup */}
-              <div className="mockup-card md:translate-y-0">
+              <div className="mockup-card md:translate-y-0 snap-center shrink-0 min-w-[85vw] md:min-w-0">
                 <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3 text-center">① Guest App</div>
                 <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mx-auto max-w-[220px]">
                   <div className="bg-slate-800 px-4 py-2 flex items-center gap-2">
@@ -76,7 +76,7 @@ export default function LandingPage() {
               </div>
 
               {/* Card 2: QR Code mockup */}
-              <div className="mockup-card md:translate-y-8">
+              <div className="mockup-card md:translate-y-8 snap-center shrink-0 min-w-[85vw] md:min-w-0">
                 <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3 text-center">② Verification</div>
                 <div className="relative mx-auto max-w-[220px]">
                   <div className="absolute inset-0 bg-gradient-to-br from-[#0A6E74]/10 to-[#0FA3B1]/10 rounded-2xl blur-xl" />
@@ -114,7 +114,7 @@ export default function LandingPage() {
               </div>
 
               {/* Card 3: Guard Dashboard mockup */}
-              <div className="mockup-card md:translate-y-0">
+              <div className="mockup-card snap-center shrink-0 min-w-[85vw] md:min-w-0">
                 <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3 text-center">③ Gate Dashboard</div>
                 <div className="bg-slate-900 rounded-2xl shadow-lg overflow-hidden mx-auto max-w-[220px]">
                   <div className="bg-slate-800 px-4 py-2 flex items-center justify-between">
@@ -175,7 +175,7 @@ export default function LandingPage() {
             Real-time analytics, booking management, and calendar — all in one place.
           </p>
           <div className="relative glass p-6 sm:p-10 rounded-2xl">
-            <div className="absolute -top-3 -right-3 bg-[#0A6E74] text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg">
+            <div className="absolute -top-3 -right-3 bg-[#0A6E74] text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg hover:scale-105 hover:shadow-xl transition-all duration-300 cursor-default">
               Live Demo
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -245,8 +245,8 @@ export default function LandingPage() {
               </div>
             </div>
             <div className="mt-6 text-center">
-              <Link href="/dashboard" className="text-sm text-[#0A6E74] font-semibold hover:underline">
-                Explore full dashboard →
+              <Link href="/dashboard" className="text-sm text-[#0A6E74] font-semibold hover:underline inline-flex items-center gap-1 hover:gap-2 transition-all duration-300">
+                Explore full dashboard <span className="inline-block transition-transform duration-300 group-hover:translate-x-1">→</span>
               </Link>
             </div>
           </div>
