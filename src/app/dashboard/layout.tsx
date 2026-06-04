@@ -29,6 +29,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
         <nav className="space-y-1 flex-1">
           <SidebarLink href="/dashboard" icon="📊">Dashboard</SidebarLink>
+          <SidebarLink href="/dashboard/analytics" icon="📈">Analytics</SidebarLink>
           <SidebarLink href="/dashboard/bookings" icon="📋">Bookings</SidebarLink>
           <SidebarLink href="/dashboard/calendar" icon="📅">Calendar</SidebarLink>
           <SidebarLink href="/dashboard/settings" icon="⚙️">Settings</SidebarLink>
@@ -43,6 +44,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
       {/* Mobile header */}
       <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-slate-200 flex justify-around py-2 px-2">
         <MobileNavLink href="/dashboard" icon="📊" label="Dashboard" />
+        <MobileNavLink href="/dashboard/analytics" icon="📈" label="Analytics" />
         <MobileNavLink href="/dashboard/bookings" icon="📋" label="Bookings" />
         <MobileNavLink href="/dashboard/calendar" icon="📅" label="Calendar" />
         <MobileNavLink href="/dashboard/settings" icon="⚙️" label="Settings" />

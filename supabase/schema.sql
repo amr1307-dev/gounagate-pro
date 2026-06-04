@@ -68,6 +68,46 @@ create table if not exists activity_logs (
   created_at timestamptz default now()
 );
 
+-- Invites (self-registration links)
+create table if not exists invites (
+  id uuid primary key default gen_random_uuid(),
+  business_id uuid references businesses not null,
+  slug text unique not null,
+  description text default '',
+  max_uses int default 0,
+  use_count int default 0,
+  is_active boolean default true,
+  expires_at timestamptz,
+  created_at timestamptz default now(),
+  created_by uuid references profiles
+);
+
+create index if not exists idx_invites_slug on invites(slug);
+
+alter table invites enable row level security;
+
+create policy "Business members can read invites"
+  on invites for select
+  using (
+    business_id in (select business_id from profiles where id = auth.uid())
+  );
+
+create policy "Business members can insert invites"
+  on invites for insert
+  with check (
+    business_id in (select business_id from profiles where id = auth.uid())
+  );
+
+create policy "Business members can update invites"
+  on invites for update
+  using (
+    business_id in (select business_id from profiles where id = auth.uid())
+  );
+
+create policy "Public can read active invite"
+  on invites for select
+  using (is_active = true);
+
 -- Indexes
 create index if not exists idx_bookings_business_date on bookings(business_id, booking_date);
 create index if not exists idx_bookings_status on bookings(status);
@@ -84,6 +124,20 @@ alter table qr_scans enable row level security;
 alter table activity_logs enable row level security;
 
 -- RLS Policies
+
+drop policy if exists "Users can read own business" on businesses;
+drop policy if exists "Public can read active businesses" on businesses;
+drop policy if exists "Users can insert businesses" on businesses;
+drop policy if exists "Users can read own profile" on profiles;
+drop policy if exists "Users can insert own profile" on profiles;
+drop policy if exists "Business members can read bookings" on bookings;
+drop policy if exists "Business members can insert bookings" on bookings;
+drop policy if exists "Public can insert bookings" on bookings;
+drop policy if exists "Business members can update bookings" on bookings;
+drop policy if exists "Business members can read invites" on invites;
+drop policy if exists "Business members can insert invites" on invites;
+drop policy if exists "Business members can update invites" on invites;
+drop policy if exists "Public can read active invite" on invites;
 
 -- Businesses: owners can read their own
 create policy "Users can read own business"
@@ -145,6 +199,28 @@ create policy "Business members can update bookings"
       select business_id from profiles where id = auth.uid()
     )
   );
+
+-- Invite increment function
+create or replace function increment_invite_use(p_slug text)
+returns jsonb
+language plpgsql
+security definer
+as $$
+declare
+  v_invite invites;
+begin
+  update invites
+  set use_count = use_count + 1
+  where slug = p_slug and is_active = true
+  returning * into v_invite;
+
+  if not found then
+    return jsonb_build_object('success', false, 'message', 'Invite not found or inactive');
+  end if;
+
+  return jsonb_build_object('success', true, 'use_count', v_invite.use_count);
+end;
+$$;
 
 -- Functions
 

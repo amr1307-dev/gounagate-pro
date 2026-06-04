@@ -1,6 +1,7 @@
 import { createServerSupabase, getUserProfile } from '@/lib/supabase-server'
 import { redirect } from 'next/navigation'
 import { SettingsForm } from './settings-form'
+import { InvitesSection } from '@/components/invites-section'
 
 export default async function SettingsPage() {
   const profile = await getUserProfile()
@@ -31,6 +32,7 @@ export default async function SettingsPage() {
       </div>
 
       <SettingsForm business={business} />
+      <InvitesSection businessName={business.name} />
     </div>
   )
 }

@@ -2,6 +2,7 @@ import { createServerSupabase, getUserProfile } from '@/lib/supabase-server'
 import { StatsCards } from '@/components/stats-cards'
 import { BookingTable } from '@/components/booking-table'
 import { ChartSection } from '@/components/chart-section'
+import { RealtimeToast } from '@/components/realtime-toast'
 
 export default async function DashboardPage() {
   const profile = await getUserProfile()
@@ -63,6 +64,8 @@ export default async function DashboardPage() {
           <BookingTable bookings={recentBookings} compact />
         </div>
       </div>
+
+      <RealtimeToast businessId={businessId} />
 
       <div className="text-center">
         <a href="/dashboard/bookings" className="text-sm text-[#0A6E74] font-medium hover:underline">

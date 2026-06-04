@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
-import { getEgyptPhone } from '@/lib/utils'
+import { useEffect, useRef, useState } from 'react'
+import { getEgyptPhone, generateTimeBasedHash } from '@/lib/utils'
 
 type BookingData = {
   id: string
@@ -25,11 +25,15 @@ export function QRDisplay({
 }) {
   const qrRef = useRef<HTMLDivElement>(null)
   const qrInstance = useRef<any>(null)
+  const [expiresAt, setExpiresAt] = useState(Date.now() + 30000)
+  const [ttl, setTtl] = useState(30)
 
-  useEffect(() => {
+  const generateQR = (expiry: number) => {
     if (!qrRef.current || typeof QRCode === 'undefined') return
 
     qrRef.current.innerHTML = ''
+
+    const dynamicHash = generateTimeBasedHash(booking.id, booking.hash)
 
     const qrData = JSON.stringify({
       id: booking.id,
@@ -40,6 +44,8 @@ export function QRDisplay({
       time: booking.booking_time,
       guests: booking.guests,
       hash: booking.hash,
+      dynamicHash,
+      expiresAt: expiry,
     })
 
     qrInstance.current = new QRCode(qrRef.current, {
@@ -50,6 +56,28 @@ export function QRDisplay({
       colorLight: '#ffffff',
       correctLevel: QRCode.CorrectLevel.H,
     })
+  }
+
+  useEffect(() => {
+    const expiry = Date.now() + 30000
+    setExpiresAt(expiry)
+    generateQR(expiry)
+
+    const ttlInterval = setInterval(() => {
+      setTtl(Math.max(0, Math.ceil((expiresAt - Date.now()) / 1000)))
+    }, 1000)
+
+    const qrInterval = setInterval(() => {
+      const nextExpiry = Date.now() + 30000
+      setExpiresAt(nextExpiry)
+      setTtl(30)
+      generateQR(nextExpiry)
+    }, 30000)
+
+    return () => {
+      clearInterval(ttlInterval)
+      clearInterval(qrInterval)
+    }
   }, [booking])
 
   const downloadQR = async () => {
@@ -106,8 +134,15 @@ export function QRDisplay({
           ✅ Booking Confirmed
         </h2>
 
-        <div className="flex justify-center mb-6">
+        <div className="flex justify-center mb-2">
           <div className="bg-white p-4 rounded-xl" ref={qrRef} />
+        </div>
+
+        <div className="text-center mb-6">
+          <div className="inline-flex items-center gap-2 text-sm">
+            <span className={`w-2 h-2 rounded-full ${ttl > 10 ? 'bg-emerald-500' : ttl > 5 ? 'bg-amber-500' : 'bg-red-500 animate-pulse'}`} />
+            <span className="font-mono text-slate-500">QR refreshes in {ttl}s</span>
+          </div>
         </div>
 
         <div className="bg-slate-50 rounded-xl p-4 mb-6 space-y-2 border border-slate-100">
@@ -118,6 +153,7 @@ export function QRDisplay({
           <SummaryRow label="Time" value={booking.booking_time} />
           <SummaryRow label="Guests" value={`${booking.guests} ${booking.guests === 1 ? 'guest' : 'guests'}`} />
           <SummaryRow label="Hash" value={booking.hash} mono />
+          <SummaryRow label="Dynamic" value={generateTimeBasedHash(booking.id, booking.hash)} mono />
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3">

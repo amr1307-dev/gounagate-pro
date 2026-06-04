@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { createClient } from '@/lib/supabase'
 import { Html5Qrcode } from 'html5-qrcode'
 import { formatDate, formatTime } from '@/lib/utils'
+import { enqueueCheckIn, syncQueue } from '@/lib/offline-queue'
 
 type ScanResult = {
   valid: boolean
@@ -69,6 +70,11 @@ export function QRScanner({ businessId, userId }: { businessId: string; userId?:
     try {
       const parsed = JSON.parse(data)
 
+      if (parsed.expiresAt && Date.now() > parsed.expiresAt) {
+        setResult({ valid: false, message: 'QR code has expired — please ask the guest to refresh their QR' })
+        return
+      }
+
       const supabase = createClient()
       const { data: booking, error: fetchError } = await supabase
         .from('bookings')
@@ -89,8 +95,8 @@ export function QRScanner({ businessId, userId }: { businessId: string; userId?:
 
       if (booking.status === 'checked-in') {
         setResult({
-          valid: true,
-          message: 'Already checked in',
+          valid: false,
+          message: 'Single-use QR already redeemed — this guest has already entered',
           booking: {
             id: booking.id,
             booking_ref: booking.booking_ref,
@@ -134,16 +140,31 @@ export function QRScanner({ businessId, userId }: { businessId: string; userId?:
       .eq('id', result.booking.id)
 
     if (updateError) {
-      setError('Failed to check in. Try again.')
+      await enqueueCheckIn({
+        bookingId: result.booking.id,
+        guestName: result.booking.guest_name,
+        scannedBy: userId,
+      })
+      setResult({
+        ...result,
+        message: '📡 Queued offline — will sync when connected',
+        booking: { ...result.booking!, status: 'checked-in' },
+      })
       return
     }
 
-    // Log the scan
     await supabase.from('qr_scans').insert({
       booking_id: result.booking.id,
       scanned_by: userId,
       action: 'check-in',
     })
+
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification('Check-In Successful', {
+        body: `${result.booking.guest_name} has entered.`,
+        icon: '/favicon.ico',
+      })
+    }
 
     setResult({
       ...result,
@@ -153,10 +174,35 @@ export function QRScanner({ businessId, userId }: { businessId: string; userId?:
   }
 
   useEffect(() => {
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission()
+    }
+
+    const doSync = async () => {
+      if (!navigator.onLine) return
+      const supabase = createClient()
+      await syncQueue(async (item) => {
+        const { error } = await supabase
+          .from('bookings')
+          .update({ status: 'checked-in', checked_in_at: new Date().toISOString(), checked_in_by: item.scannedBy })
+          .eq('id', item.bookingId)
+        if (error) return false
+        await supabase.from('qr_scans').insert({
+          booking_id: item.bookingId,
+          scanned_by: item.scannedBy,
+          action: 'check-in',
+        })
+        return true
+      })
+    }
+
+    doSync()
+    window.addEventListener('online', doSync)
     return () => {
+      window.removeEventListener('online', doSync)
       scannerRef.current?.stop().catch(() => {})
     }
-  }, [])
+  }, [userId])
 
   return (
     <div className="glass p-6 sm:p-8">

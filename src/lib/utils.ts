@@ -37,6 +37,18 @@ export function formatTime(timeStr: string): string {
   return `${h}:${m}`
 }
 
+export function generateTimeBasedHash(bookingId: string, baseHash: string): string {
+  const windowMs = Math.floor(Date.now() / 30000) * 30000
+  const raw = `${bookingId}|${baseHash}|${windowMs}`
+  let hash = 0
+  for (let i = 0; i < raw.length; i++) {
+    const char = raw.charCodeAt(i)
+    hash = ((hash << 5) - hash) + char
+    hash |= 0
+  }
+  return `D${Math.abs(hash).toString(16).toUpperCase().padStart(7, '0')}`
+}
+
 export function getEgyptPhone(phone: string): string {
   const cleaned = phone.replace(/[\s+]/g, '')
   if (cleaned.startsWith('2')) return cleaned
