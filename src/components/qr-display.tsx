@@ -8,6 +8,7 @@ type BookingData = {
   booking_ref: string
   guest_name: string
   guest_phone: string
+  car_plate: string
   booking_date: string
   booking_time: string
   guests: number
@@ -40,6 +41,7 @@ export function QRDisplay({
       ref: booking.booking_ref,
       name: booking.guest_name,
       phone: booking.guest_phone,
+      plate: booking.car_plate,
       date: booking.booking_date,
       time: booking.booking_time,
       guests: booking.guests,
@@ -149,6 +151,7 @@ export function QRDisplay({
           <SummaryRow label="Ref" value={booking.booking_ref} badge />
           <SummaryRow label="Name" value={booking.guest_name} />
           <SummaryRow label="Phone" value={booking.guest_phone} />
+          {booking.car_plate && <SummaryRow label="Car Plate" value={booking.car_plate} />}
           <SummaryRow label="Date" value={formatDate(booking.booking_date)} />
           <SummaryRow label="Time" value={booking.booking_time} />
           <SummaryRow label="Guests" value={`${booking.guests} ${booking.guests === 1 ? 'guest' : 'guests'}`} />

@@ -11,6 +11,7 @@ type BookingData = {
   guest_name: string
   guest_phone: string
   guest_email: string
+  car_plate: string
   booking_date: string
   booking_time: string
   guests: number
@@ -43,6 +44,7 @@ export function BookingForm({ business }: { business: BusinessData }) {
       guest_name: (form.elements.namedItem('name') as HTMLInputElement).value.trim(),
       guest_phone: (form.elements.namedItem('phone') as HTMLInputElement).value.trim(),
       guest_email: (form.elements.namedItem('email') as HTMLInputElement).value.trim(),
+      car_plate: (form.elements.namedItem('plate') as HTMLInputElement).value.trim(),
       booking_date: (form.elements.namedItem('date') as HTMLInputElement).value,
       booking_time: (form.elements.namedItem('time') as HTMLInputElement).value,
       guests: parseInt((form.elements.namedItem('guests') as HTMLInputElement).value),
@@ -73,7 +75,7 @@ export function BookingForm({ business }: { business: BusinessData }) {
     try {
       const id = crypto.randomUUID()
       const bookingRef = generateBookingRef()
-      const hash = generateHash({ id, name: data.guest_name, phone: data.guest_phone, date: data.booking_date, time: data.booking_time })
+      const hash = generateHash({ id, name: data.guest_name, phone: data.guest_phone, date: data.booking_date, time: data.booking_time, plate: data.car_plate })
 
       const newBooking: BookingData = {
         id,
@@ -81,6 +83,7 @@ export function BookingForm({ business }: { business: BusinessData }) {
         guest_name: data.guest_name,
         guest_phone: data.guest_phone,
         guest_email: data.guest_email,
+        car_plate: data.car_plate,
         booking_date: data.booking_date,
         booking_time: data.booking_time,
         guests: data.guests,
@@ -98,6 +101,7 @@ export function BookingForm({ business }: { business: BusinessData }) {
         guest_name: newBooking.guest_name,
         guest_phone: newBooking.guest_phone,
         guest_email: newBooking.guest_email,
+        car_plate: newBooking.car_plate,
         booking_date: newBooking.booking_date,
         booking_time: newBooking.booking_time,
         guests: newBooking.guests,
@@ -134,6 +138,9 @@ export function BookingForm({ business }: { business: BusinessData }) {
           </FormField>
           <FormField label="Phone Number" error={errors.phone} required>
             <input name="phone" type="tel" className={`input-field ${errors.phone ? 'error' : ''}`} placeholder="e.g. 01234567890" required />
+          </FormField>
+          <FormField label="Car Plate" error={errors.plate}>
+            <input name="plate" type="text" className="input-field" placeholder="e.g. 1234 ABC" />
           </FormField>
           <FormField label="Email" error={errors.email} required>
             <input name="email" type="email" className={`input-field ${errors.email ? 'error' : ''}`} placeholder="email@example.com" required />

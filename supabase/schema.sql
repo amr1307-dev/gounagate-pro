@@ -39,6 +39,7 @@ create table if not exists bookings (
   booking_time time not null,
   guests int not null check (guests between 1 and 50),
   special_requests text default '',
+  car_plate text default '',
   hash text not null,
   status text not null default 'confirmed' check (status in ('pending','confirmed','checked-in','cancelled','no-show')),
   checked_in_at timestamptz,

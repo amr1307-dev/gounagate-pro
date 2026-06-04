@@ -14,6 +14,7 @@ type ScanResult = {
     booking_ref: string
     guest_name: string
     guest_phone: string
+    car_plate: string
     booking_date: string
     booking_time: string
     guests: number
@@ -102,6 +103,7 @@ export function QRScanner({ businessId, userId }: { businessId: string; userId?:
             booking_ref: booking.booking_ref,
             guest_name: booking.guest_name,
             guest_phone: booking.guest_phone,
+            car_plate: booking.car_plate || '',
             booking_date: booking.booking_date,
             booking_time: booking.booking_time,
             guests: booking.guests,
@@ -119,6 +121,7 @@ export function QRScanner({ businessId, userId }: { businessId: string; userId?:
           booking_ref: booking.booking_ref,
           guest_name: booking.guest_name,
           guest_phone: booking.guest_phone,
+          car_plate: booking.car_plate || '',
           booking_date: booking.booking_date,
           booking_time: booking.booking_time,
           guests: booking.guests,
@@ -257,6 +260,12 @@ export function QRScanner({ businessId, userId }: { businessId: string; userId?:
                 <span className="text-slate-400">Phone</span>
                 <span className="font-semibold">{result.booking.guest_phone}</span>
               </div>
+              {result.booking.car_plate && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-slate-400">Car Plate</span>
+                  <span className="font-semibold">{result.booking.car_plate}</span>
+                </div>
+              )}
               <div className="flex justify-between text-sm">
                 <span className="text-slate-400">Date</span>
                 <span className="font-semibold">{formatDate(result.booking.booking_date)}</span>

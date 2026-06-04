@@ -25,6 +25,7 @@ type BookingData = {
   guest_name: string
   guest_phone: string
   guest_email: string
+  car_plate: string
   booking_date: string
   booking_time: string
   guests: number
@@ -77,6 +78,7 @@ export default function InvitePage() {
       guest_name: (form.elements.namedItem('name') as HTMLInputElement).value.trim(),
       guest_phone: (form.elements.namedItem('phone') as HTMLInputElement).value.trim(),
       guest_email: (form.elements.namedItem('email') as HTMLInputElement).value.trim(),
+      car_plate: (form.elements.namedItem('plate') as HTMLInputElement).value.trim(),
       booking_date: (form.elements.namedItem('date') as HTMLInputElement).value,
       booking_time: (form.elements.namedItem('time') as HTMLInputElement).value,
       guests: parseInt((form.elements.namedItem('guests') as HTMLInputElement).value),
@@ -92,7 +94,7 @@ export default function InvitePage() {
       const bookingRef = generateBookingRef()
       const hash = generateHash({
         id, name: data.guest_name, phone: data.guest_phone,
-        date: data.booking_date, time: data.booking_time,
+        date: data.booking_date, time: data.booking_time, plate: data.car_plate,
       })
 
       const supabase = createClient()
@@ -103,6 +105,7 @@ export default function InvitePage() {
         guest_name: data.guest_name,
         guest_phone: data.guest_phone,
         guest_email: data.guest_email,
+        car_plate: data.car_plate,
         booking_date: data.booking_date,
         booking_time: data.booking_time,
         guests: data.guests,
@@ -117,6 +120,7 @@ export default function InvitePage() {
       setBooking({
         id, booking_ref: bookingRef, hash, status: 'confirmed', created_at: new Date().toISOString(),
         guest_name: data.guest_name, guest_phone: data.guest_phone, guest_email: data.guest_email,
+        car_plate: data.car_plate,
         booking_date: data.booking_date, booking_time: data.booking_time, guests: data.guests,
       })
       setStep('result')
@@ -184,6 +188,10 @@ export default function InvitePage() {
               <div>
                 <label className="text-sm font-medium text-slate-500 mb-1.5 block">Phone *</label>
                 <input name="phone" type="tel" className="input-field" placeholder="e.g. 01234567890" required />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-slate-500 mb-1.5 block">Car Plate</label>
+                <input name="plate" type="text" className="input-field" placeholder="e.g. 1234 ABC" />
               </div>
               <div>
                 <label className="text-sm font-medium text-slate-500 mb-1.5 block">Email</label>

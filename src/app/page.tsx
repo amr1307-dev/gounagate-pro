@@ -1,17 +1,5 @@
 import Link from 'next/link'
 
-const stats = [
-  { number: '5,000+', key: 'statsQR' },
-  { number: '500+', key: 'statsClients' },
-  { number: '15+', key: 'statsGates' },
-]
-
-const steps = [
-  { icon: '📱', titleKey: 'step1Title', descKey: 'step1Desc' },
-  { icon: '⚙️', titleKey: 'step2Title', descKey: 'step2Desc' },
-  { icon: '✅', titleKey: 'step3Title', descKey: 'step3Desc' },
-]
-
 const features = [
   { bg: 'bg-emerald-50', icon: '🔄', titleKey: 'feature1Title', descKey: 'feature1Desc' },
   { bg: 'bg-blue-50', icon: '🔗', titleKey: 'feature2Title', descKey: 'feature2Desc' },
@@ -25,9 +13,9 @@ export default function LandingPage() {
   return (
     <div>
       {/* Hero */}
-      <section className="relative overflow-hidden px-4 pt-20 pb-16 sm:px-6 sm:pt-28 sm:pb-20 hero-gradient">
+      <section className="relative overflow-hidden px-4 pt-20 pb-28 sm:px-6 sm:pt-28 sm:pb-36 hero-gradient">
         <div className="mx-auto max-w-6xl">
-          <div className="text-center mb-12">
+          <div className="text-center mb-16">
             <span className="trust-badge mb-4 inline-flex">🏆 #1 QR Entry System for El Gouna</span>
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-slate-900 max-w-4xl mx-auto leading-tight">
               Save 15+ Minutes of{' '}
@@ -50,24 +38,110 @@ export default function LandingPage() {
             <p className="mt-4 text-sm text-slate-400">No credit card required · GDPR Compliant · 99.9% Uptime</p>
           </div>
 
-          {/* Flow Diagram */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-0 items-center max-w-4xl mx-auto">
-            <div className="flow-step">
-              <div className="flow-step-icon">📱</div>
-              <h3 className="font-bold text-slate-900 text-lg mb-1">Guest Books</h3>
-              <p className="text-sm text-slate-500">Fills the form from their phone in seconds. No app download needed.</p>
-            </div>
-            <div className="flow-arrow">→</div>
-            <div className="flow-step">
-              <div className="flow-step-icon">⚙️</div>
-              <h3 className="font-bold text-slate-900 text-lg mb-1">System Generates QR</h3>
-              <p className="text-sm text-slate-500">Encrypted smart QR code with unique verification hash issued instantly.</p>
-            </div>
-            <div className="flow-arrow md:hidden">→</div>
-            <div className="flow-step md:col-start-3">
-              <div className="flow-step-icon">✅</div>
-              <h3 className="font-bold text-slate-900 text-lg mb-1">Guard Scans & Approves</h3>
-              <p className="text-sm text-slate-500">Scan at the gate → green light → instant entry with status update.</p>
+          {/* 3 Mini UI Mockups with SVG Curves */}
+          <div className="relative max-w-5xl mx-auto">
+            {/* SVG connecting lines */}
+            <svg className="absolute inset-0 w-full h-full pointer-events-none z-0 hidden md:block" viewBox="0 0 1000 400" preserveAspectRatio="xMidYMid meet">
+              <path d="M 280 180 Q 500 80 720 180" fill="none" stroke="#0A6E74" strokeWidth="2" strokeDasharray="8 6" opacity="0.3" />
+            </svg>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 relative z-10">
+              {/* Card 1: Phone mockup */}
+              <div className="mockup-card md:translate-y-0">
+                <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3 text-center">① Guest App</div>
+                <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mx-auto max-w-[220px]">
+                  <div className="bg-slate-800 px-4 py-2 flex items-center gap-2">
+                    <div className="flex gap-1.5">
+                      <div className="size-2 rounded-full bg-red-500" />
+                      <div className="size-2 rounded-full bg-amber-500" />
+                      <div className="size-2 rounded-full bg-green-500" />
+                    </div>
+                    <span className="text-[10px] text-slate-400 font-mono ml-2">gounagate.app</span>
+                  </div>
+                  <div className="p-4 space-y-3">
+                    <div>
+                      <label className="text-[10px] font-medium text-slate-400 block mb-1">Guest Name</label>
+                      <div className="h-7 bg-slate-100 rounded-md px-2 flex items-center text-xs text-slate-400">Omar Hassan</div>
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-medium text-slate-400 block mb-1">Car Plate</label>
+                      <div className="h-7 bg-slate-100 rounded-md px-2 flex items-center text-xs text-slate-400">1234 ABC</div>
+                    </div>
+                    <button className="w-full py-2 rounded-lg text-xs font-bold text-white bg-gradient-to-r from-[#0A6E74] to-[#0FA3B1] shadow-sm">
+                      Request Entry Permit
+                    </button>
+                    <p className="text-[9px] text-slate-400 text-center">Tap to book — takes 10 seconds</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Card 2: QR Code mockup */}
+              <div className="mockup-card md:translate-y-8">
+                <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3 text-center">② Verification</div>
+                <div className="relative mx-auto max-w-[220px]">
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#0A6E74]/10 to-[#0FA3B1]/10 rounded-2xl blur-xl" />
+                  <div className="relative bg-white rounded-2xl border border-slate-200 shadow-sm p-5 text-center">
+                    <div className="inline-flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 rounded-full px-3 py-1 mb-4">
+                      <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      <span className="text-[10px] font-bold text-emerald-700">Dynamic QR: Active</span>
+                    </div>
+                    <div className="bg-white mx-auto mb-3 p-2 rounded-xl border border-slate-100 inline-block">
+                      <svg width="110" height="110" viewBox="0 0 110 110">
+                        <rect x="10" y="10" width="10" height="10" fill="#0A6E74" />
+                        <rect x="30" y="10" width="10" height="10" fill="#0A6E74" />
+                        <rect x="50" y="10" width="10" height="10" fill="#0A6E74" />
+                        <rect x="70" y="10" width="10" height="10" fill="#0A6E74" />
+                        <rect x="10" y="30" width="10" height="10" fill="#0A6E74" />
+                        <rect x="50" y="30" width="10" height="10" fill="#0A6E74" />
+                        <rect x="80" y="30" width="10" height="10" fill="#0A6E74" />
+                        <rect x="10" y="50" width="10" height="10" fill="#0A6E74" />
+                        <rect x="30" y="50" width="10" height="10" fill="#0A6E74" />
+                        <rect x="70" y="50" width="10" height="10" fill="#0A6E74" />
+                        <rect x="90" y="50" width="10" height="10" fill="#0A6E74" />
+                        <rect x="30" y="70" width="10" height="10" fill="#0A6E74" />
+                        <rect x="50" y="70" width="10" height="10" fill="#0A6E74" />
+                        <rect x="70" y="70" width="10" height="10" fill="#0A6E74" />
+                        <rect x="90" y="70" width="10" height="10" fill="#0A6E74" />
+                        <rect x="10" y="90" width="10" height="10" fill="#0A6E74" />
+                        <rect x="50" y="90" width="10" height="10" fill="#0A6E74" />
+                        <rect x="70" y="90" width="10" height="10" fill="#0A6E74" />
+                        <rect x="90" y="90" width="10" height="10" fill="#0A6E74" />
+                      </svg>
+                    </div>
+                    <p className="text-[10px] font-mono text-slate-400 break-all">#H1A2B3C • expires in 24s</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Card 3: Guard Dashboard mockup */}
+              <div className="mockup-card md:translate-y-0">
+                <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3 text-center">③ Gate Dashboard</div>
+                <div className="bg-slate-900 rounded-2xl shadow-lg overflow-hidden mx-auto max-w-[220px]">
+                  <div className="bg-slate-800 px-4 py-2 flex items-center justify-between">
+                    <span className="text-[10px] text-slate-400 font-semibold">🛡️ Gate Panel</span>
+                    <span className="text-[10px] text-emerald-400">● Live</span>
+                  </div>
+                  <div className="p-4">
+                    <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-3 text-center mb-3">
+                      <div className="text-2xl mb-1">✅</div>
+                      <div className="text-xs font-bold text-emerald-400">ACCESS GRANTED</div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="size-10 rounded-full bg-gradient-to-br from-[#0A6E74] to-[#0FA3B1] flex items-center justify-center text-white font-bold text-sm">
+                        OH
+                      </div>
+                      <div>
+                        <div className="text-xs font-semibold text-white">Omar Hassan</div>
+                        <div className="text-[10px] text-slate-500">Plate: 1234 ABC</div>
+                      </div>
+                    </div>
+                    <div className="mt-3 pt-3 border-t border-slate-800 text-[10px] text-slate-500 flex justify-between">
+                      <span>Entry: 10:32 AM</span>
+                      <span className="text-emerald-400">✓ Synced</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -76,33 +150,105 @@ export default function LandingPage() {
       {/* Stats */}
       <section className="px-4 py-12 bg-white/60 border-y border-slate-100">
         <div className="mx-auto max-w-4xl grid grid-cols-3 gap-4">
-          {stats.map((s) => (
-            <div key={s.key} className="stat-item">
-              <div className="stat-number">{s.number}</div>
-              <div className="stat-label">{s.key === 'statsQR' ? 'QR Codes Issued' : s.key === 'statsClients' ? 'Active Clients' : 'Gates Connected'}</div>
-            </div>
-          ))}
+          <div className="stat-item">
+            <div className="stat-number">5,000+</div>
+            <div className="stat-label">QR Codes Issued</div>
+          </div>
+          <div className="stat-item">
+            <div className="stat-number">500+</div>
+            <div className="stat-label">Active Clients</div>
+          </div>
+          <div className="stat-item">
+            <div className="stat-number">15+</div>
+            <div className="stat-label">Gates Connected</div>
+          </div>
         </div>
       </section>
 
-      {/* How It Works */}
+      {/* Dashboard Screenshots (replaces How It Works) */}
       <section className="px-4 py-20 sm:px-6 sm:py-28">
         <div className="mx-auto max-w-7xl">
           <h2 className="text-3xl sm:text-4xl font-bold text-center text-slate-900 mb-4">
-            How It Works
+            Powerful Dashboard Behind the Scenes
           </h2>
           <p className="text-center text-slate-500 max-w-xl mx-auto mb-12">
-            Three simple steps from booking to entry. No training required.
+            Real-time analytics, booking management, and calendar — all in one place.
           </p>
-          <div className="grid gap-6 md:grid-cols-3 max-w-5xl mx-auto">
-            {steps.map((step, i) => (
-              <div key={i} className="glass p-8 text-center relative">
-                <div className="text-5xl mb-4">{step.icon}</div>
-                <div className="text-sm font-bold text-[#0A6E74] mb-2">STEP 0{i + 1}</div>
-                <h3 className="text-xl font-semibold text-slate-900 mb-2">{step.titleKey === 'step1Title' ? 'Guest Books' : step.titleKey === 'step2Title' ? 'System Generates QR' : 'Guard Scans & Approves'}</h3>
-                <p className="text-slate-500">{step.descKey === 'step1Desc' ? 'Fills the form from their phone in seconds. No app download needed.' : step.descKey === 'step2Desc' ? 'Encrypted smart QR code with unique verification hash issued instantly.' : 'Scan at the gate → green light → instant entry with status update.'}</p>
+          <div className="relative glass p-6 sm:p-10 rounded-2xl">
+            <div className="absolute -top-3 -right-3 bg-[#0A6E74] text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg">
+              Live Demo
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-white rounded-xl border border-slate-100 p-4 shadow-sm">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-sm font-semibold text-slate-900">📊 Today</span>
+                  <span className="text-xs text-slate-400">Updated now</span>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-emerald-50 rounded-lg p-3 text-center">
+                    <div className="text-2xl font-bold text-emerald-600">24</div>
+                    <div className="text-[10px] text-slate-500">Bookings</div>
+                  </div>
+                  <div className="bg-blue-50 rounded-lg p-3 text-center">
+                    <div className="text-2xl font-bold text-blue-600">18</div>
+                    <div className="text-[10px] text-slate-500">Checked In</div>
+                  </div>
+                  <div className="bg-amber-50 rounded-lg p-3 text-center">
+                    <div className="text-2xl font-bold text-amber-600">4</div>
+                    <div className="text-[10px] text-slate-500">Pending</div>
+                  </div>
+                  <div className="bg-purple-50 rounded-lg p-3 text-center">
+                    <div className="text-2xl font-bold text-purple-600">2</div>
+                    <div className="text-[10px] text-slate-500">Cancelled</div>
+                  </div>
+                </div>
               </div>
-            ))}
+              <div className="bg-white rounded-xl border border-slate-100 p-4 shadow-sm">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-sm font-semibold text-slate-900">📅 Recent Activity</span>
+                  <span className="text-xs text-slate-400">Today</span>
+                </div>
+                <div className="space-y-2">
+                  {['Omar Hassan ✓', 'Mariam Ali ✓', 'Khaled Youssef', 'Nour El-Din', 'Sara Adel ✓'].map((name, i) => (
+                    <div key={i} className="flex items-center justify-between text-xs">
+                      <div className="flex items-center gap-2">
+                        <div className="size-5 rounded-full bg-gradient-to-br from-[#0A6E74] to-[#0FA3B1] flex items-center justify-center text-white font-bold text-[8px]">
+                          {name.split(' ').map(w => w[0]).join('')}
+                        </div>
+                        <span className="text-slate-700">{name.replace(' ✓', '')}</span>
+                      </div>
+                      <span className={name.includes('✓') ? 'text-emerald-500' : 'text-slate-400'}>
+                        {name.includes('✓') ? 'Checked In' : 'Confirmed'}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="bg-white rounded-xl border border-slate-100 p-4 shadow-sm">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-sm font-semibold text-slate-900">📈 Occupancy</span>
+                  <span className="text-xs text-slate-400">72%</span>
+                </div>
+                <div className="mb-4">
+                  <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
+                    <div className="h-full w-[72%] bg-gradient-to-r from-[#0A6E74] to-[#0FA3B1] rounded-full" />
+                  </div>
+                  <div className="flex justify-between text-[10px] text-slate-400 mt-1">
+                    <span>0</span>
+                    <span>100</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-slate-500">
+                  <span className="inline-block size-2 rounded-full bg-emerald-500" />
+                  Peak hours: 10:00 – 14:00
+                </div>
+              </div>
+            </div>
+            <div className="mt-6 text-center">
+              <Link href="/dashboard" className="text-sm text-[#0A6E74] font-semibold hover:underline">
+                Explore full dashboard →
+              </Link>
+            </div>
           </div>
         </div>
       </section>
