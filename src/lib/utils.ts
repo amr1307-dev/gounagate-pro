@@ -37,8 +37,9 @@ export function formatTime(timeStr: string): string {
   return `${h}:${m}`
 }
 
-export function generateTimeBasedHash(bookingId: string, baseHash: string): string {
-  const windowMs = Math.floor(Date.now() / 30000) * 30000
+export function generateTimeBasedHash(bookingId: string, baseHash: string, customTimestamp?: number): string {
+  const ts = customTimestamp ?? Date.now()
+  const windowMs = Math.floor(ts / 30000) * 30000
   const raw = `${bookingId}|${baseHash}|${windowMs}`
   let hash = 0
   for (let i = 0; i < raw.length; i++) {

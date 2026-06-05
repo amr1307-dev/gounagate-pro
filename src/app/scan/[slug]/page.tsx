@@ -16,13 +16,10 @@ export default async function ScanPage() {
     <>
       <Script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js" strategy="lazyOnload" />
 
-      <div className="mx-auto max-w-lg px-4 py-8">
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-slate-900">Paradise World Hurghada</h1>
-          <p className="text-slate-500">Session Verification</p>
+      <div className="min-h-screen hero-gradient-paradise">
+        <div className="mx-auto max-w-lg px-4 py-8 sm:py-12">
+          <QRScanner userId={user?.id} />
         </div>
-
-        <QRScanner userId={user?.id} />
       </div>
     </>
   )

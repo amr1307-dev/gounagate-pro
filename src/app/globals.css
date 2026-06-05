@@ -256,3 +256,55 @@
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+
+/* QR Scanner frame animation */
+.scan-frame {
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  border: 3px solid rgba(10, 110, 116, 0.5);
+  box-shadow: 0 0 0 2px rgba(10, 110, 116, 0.08), inset 0 0 0 2px rgba(10, 110, 116, 0.08);
+  animation: scan-pulse 2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.scan-frame::before {
+  content: '';
+  position: absolute;
+  top: -3px; left: -3px;
+  width: 40px; height: 40px;
+  border-top: 4px solid var(--primary);
+  border-left: 4px solid var(--primary);
+  border-radius: 16px 0 0 0;
+}
+
+.scan-frame::after {
+  content: '';
+  position: absolute;
+  bottom: -3px; right: -3px;
+  width: 40px; height: 40px;
+  border-bottom: 4px solid var(--primary);
+  border-right: 4px solid var(--primary);
+  border-radius: 0 0 16px 0;
+}
+
+.scan-line {
+  position: absolute;
+  left: 8px; right: 8px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--primary), var(--accent), var(--primary), transparent);
+  opacity: 0.7;
+  animation: scan-move 2.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes scan-pulse {
+  0%, 100% { border-color: rgba(10, 110, 116, 0.5); }
+  50% { border-color: rgba(10, 110, 116, 0.9); }
+}
+
+@keyframes scan-move {
+  0% { top: 8px; }
+  50% { top: calc(100% - 8px); }
+  100% { top: 8px; }
+}
