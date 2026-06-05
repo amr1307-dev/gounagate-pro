@@ -12,18 +12,9 @@ export async function GET(req: Request) {
 
   const supabase = await createServerSupabase()
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('business_id')
-    .eq('id', user.id)
-    .single()
-
-  if (!profile) return NextResponse.json({ error: 'No business profile' }, { status: 404 })
-
   let query = supabase
     .from('bookings')
     .select('*')
-    .eq('business_id', profile.business_id)
     .order('booking_date', { ascending: false })
     .limit(limit)
 
@@ -41,20 +32,11 @@ export async function POST(req: Request) {
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const body = await req.json()
-
   const supabase = await createServerSupabase()
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('business_id')
-    .eq('id', user.id)
-    .single()
-
-  if (!profile) return NextResponse.json({ error: 'No business profile' }, { status: 404 })
 
   const { data, error } = await supabase
     .from('bookings')
-    .insert({ ...body, business_id: profile.business_id })
+    .insert(body)
     .select()
     .single()
 

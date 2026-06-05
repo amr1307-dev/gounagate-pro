@@ -24,7 +24,6 @@ export async function middleware(request: NextRequest) {
   )
 
   const { data: { user } } = await supabase.auth.getUser()
-
   const { pathname } = request.nextUrl
 
   // Protected routes
@@ -32,11 +31,6 @@ export async function middleware(request: NextRequest) {
     const url = request.nextUrl.clone()
     url.pathname = '/auth/login'
     return NextResponse.redirect(url)
-  }
-
-  // API protection
-  if (pathname.startsWith('/api/admin') && !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   return supabaseResponse

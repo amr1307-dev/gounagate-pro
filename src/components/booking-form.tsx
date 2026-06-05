@@ -11,26 +11,33 @@ type BookingData = {
   guest_name: string
   guest_phone: string
   guest_email: string
-  car_plate: string
   booking_date: string
   booking_time: string
-  guests: number
+  total_price: number
   special_requests: string
   hash: string
   status: string
   created_at: string
+  package_id?: string
+  branch_id?: string
 }
 
-type BusinessData = {
+type Package = {
   id: string
-  name: string
-  slug: string
-  primary_color: string
-  whatsapp_owner: string
-  max_capacity: number
+  name_en: string
+  price: number
+  duration_minutes: number
+  categories: { name_en: string }
 }
 
-export function BookingForm({ business }: { business: BusinessData }) {
+type Branch = {
+  id: string
+  name_en: string
+  name_ar: string
+  address: string
+}
+
+export function BookingForm({ pkg, branches }: { pkg: Package; branches: Branch[] }) {
   const [step, setStep] = useState<'form' | 'result'>('form')
   const [booking, setBooking] = useState<BookingData | null>(null)
   const [loading, setLoading] = useState(false)
@@ -44,10 +51,9 @@ export function BookingForm({ business }: { business: BusinessData }) {
       guest_name: (form.elements.namedItem('name') as HTMLInputElement).value.trim(),
       guest_phone: (form.elements.namedItem('phone') as HTMLInputElement).value.trim(),
       guest_email: (form.elements.namedItem('email') as HTMLInputElement).value.trim(),
-      car_plate: (form.elements.namedItem('plate') as HTMLInputElement).value.trim(),
+      branch_id: (form.elements.namedItem('branch') as HTMLSelectElement).value,
       booking_date: (form.elements.namedItem('date') as HTMLInputElement).value,
       booking_time: (form.elements.namedItem('time') as HTMLInputElement).value,
-      guests: parseInt((form.elements.namedItem('guests') as HTMLInputElement).value),
       special_requests: (form.elements.namedItem('requests') as HTMLTextAreaElement).value.trim(),
     }
 
@@ -55,10 +61,10 @@ export function BookingForm({ business }: { business: BusinessData }) {
 
     if (data.guest_name.length < 3) newErrors.name = 'At least 3 characters required'
     if (!/^01[0-9]{9}$/.test(data.guest_phone)) newErrors.phone = 'Valid Egyptian number required (01xxxxxxxxx)'
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.guest_email)) newErrors.email = 'Valid email required'
+    if (data.guest_email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.guest_email)) newErrors.email = 'Valid email required'
     if (!data.booking_date) newErrors.date = 'Please select a date'
     if (!data.booking_time) newErrors.time = 'Please select a time'
-    if (isNaN(data.guests) || data.guests < 1 || data.guests > 50) newErrors.guests = 'Between 1 and 50'
+    if (!data.branch_id) newErrors.branch = 'Please select a branch'
 
     if (data.booking_date && data.booking_time) {
       const dt = new Date(`${data.booking_date}T${data.booking_time}`)
@@ -75,7 +81,7 @@ export function BookingForm({ business }: { business: BusinessData }) {
     try {
       const id = crypto.randomUUID()
       const bookingRef = generateBookingRef()
-      const hash = generateHash({ id, name: data.guest_name, phone: data.guest_phone, date: data.booking_date, time: data.booking_time, plate: data.car_plate })
+      const hash = generateHash({ id, name: data.guest_name, phone: data.guest_phone, date: data.booking_date, time: data.booking_time })
 
       const newBooking: BookingData = {
         id,
@@ -83,10 +89,11 @@ export function BookingForm({ business }: { business: BusinessData }) {
         guest_name: data.guest_name,
         guest_phone: data.guest_phone,
         guest_email: data.guest_email,
-        car_plate: data.car_plate,
+        package_id: pkg.id,
+        branch_id: data.branch_id,
         booking_date: data.booking_date,
         booking_time: data.booking_time,
-        guests: data.guests,
+        total_price: pkg.price,
         special_requests: data.special_requests,
         hash,
         status: 'confirmed',
@@ -96,15 +103,15 @@ export function BookingForm({ business }: { business: BusinessData }) {
       const supabase = createClient()
       const { error } = await supabase.from('bookings').insert({
         id: newBooking.id,
-        business_id: business.id,
         booking_ref: newBooking.booking_ref,
+        package_id: pkg.id,
+        branch_id: data.branch_id,
         guest_name: newBooking.guest_name,
         guest_phone: newBooking.guest_phone,
         guest_email: newBooking.guest_email,
-        car_plate: newBooking.car_plate,
         booking_date: newBooking.booking_date,
         booking_time: newBooking.booking_time,
-        guests: newBooking.guests,
+        total_price: pkg.price,
         special_requests: newBooking.special_requests,
         hash: newBooking.hash,
         status: newBooking.status,
@@ -123,13 +130,13 @@ export function BookingForm({ business }: { business: BusinessData }) {
   }
 
   if (step === 'result' && booking) {
-    return <QRDisplay booking={booking} businessName={business.name} onNew={() => { setStep('form'); setBooking(null) }} />
+    return <QRDisplay booking={booking} packageName={pkg.name_en} branchName={branches.find(b => b.id === booking.branch_id)?.name_en || ''} onNew={() => { setStep('form'); setBooking(null) }} />
   }
 
   return (
     <div className="glass p-6 sm:p-8">
       <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-6 flex items-center gap-3">
-        📋 New Booking
+        📋 Book Your Session
       </h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid gap-4 sm:grid-cols-2">
@@ -139,20 +146,22 @@ export function BookingForm({ business }: { business: BusinessData }) {
           <FormField label="Phone Number" error={errors.phone} required>
             <input name="phone" type="tel" className={`input-field ${errors.phone ? 'error' : ''}`} placeholder="e.g. 01234567890" required />
           </FormField>
-          <FormField label="Car Plate" error={errors.plate}>
-            <input name="plate" type="text" className="input-field" placeholder="e.g. 1234 ABC" />
+          <FormField label="Email" error={errors.email}>
+            <input name="email" type="email" className={`input-field ${errors.email ? 'error' : ''}`} placeholder="email@example.com" />
           </FormField>
-          <FormField label="Email" error={errors.email} required>
-            <input name="email" type="email" className={`input-field ${errors.email ? 'error' : ''}`} placeholder="email@example.com" required />
+          <FormField label="Branch" error={errors.branch} required>
+            <select name="branch" className={`input-field ${errors.branch ? 'error' : ''}`} required>
+              <option value="">Select a branch</option>
+              {branches.map(b => (
+                <option key={b.id} value={b.id}>{b.name_en} - {b.name_ar}</option>
+              ))}
+            </select>
           </FormField>
           <FormField label="Date" error={errors.date} required>
             <input name="date" type="date" className={`input-field ${errors.date ? 'error' : ''}`} defaultValue={getTodayStr()} min={getTodayStr()} required />
           </FormField>
           <FormField label="Time" error={errors.time} required>
             <input name="time" type="time" className={`input-field ${errors.time ? 'error' : ''}`} defaultValue={new Date().toTimeString().slice(0, 5)} required />
-          </FormField>
-          <FormField label="Number of Guests" error={errors.guests} required>
-            <input name="guests" type="number" className={`input-field ${errors.guests ? 'error' : ''}`} defaultValue={1} min={1} max={50} required />
           </FormField>
           <div className="sm:col-span-2">
             <FormField label="Special Requests">
@@ -172,7 +181,7 @@ export function BookingForm({ business }: { business: BusinessData }) {
               Processing...
             </span>
           ) : (
-            '✅ Book Now'
+            `✅ Book Now - ${pkg.price.toLocaleString('en-EG')} EGP`
           )}
         </button>
       </form>

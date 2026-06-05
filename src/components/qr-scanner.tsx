@@ -14,15 +14,13 @@ type ScanResult = {
     booking_ref: string
     guest_name: string
     guest_phone: string
-    car_plate: string
     booking_date: string
     booking_time: string
-    guests: number
     status: string
   }
 }
 
-export function QRScanner({ businessId, userId }: { businessId: string; userId?: string }) {
+export function QRScanner({ userId }: { userId?: string }) {
   const [scanning, setScanning] = useState(false)
   const [result, setResult] = useState<ScanResult | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -94,19 +92,17 @@ export function QRScanner({ businessId, userId }: { businessId: string; userId?:
         return
       }
 
-      if (booking.status === 'checked-in') {
+      if (booking.status === 'completed') {
         setResult({
           valid: false,
-          message: 'Single-use QR already redeemed — this guest has already entered',
+          message: 'This session has already been completed',
           booking: {
             id: booking.id,
             booking_ref: booking.booking_ref,
             guest_name: booking.guest_name,
             guest_phone: booking.guest_phone,
-            car_plate: booking.car_plate || '',
             booking_date: booking.booking_date,
             booking_time: booking.booking_time,
-            guests: booking.guests,
             status: booking.status,
           },
         })
@@ -121,10 +117,8 @@ export function QRScanner({ businessId, userId }: { businessId: string; userId?:
           booking_ref: booking.booking_ref,
           guest_name: booking.guest_name,
           guest_phone: booking.guest_phone,
-          car_plate: booking.car_plate || '',
           booking_date: booking.booking_date,
           booking_time: booking.booking_time,
-          guests: booking.guests,
           status: booking.status,
         },
       })
@@ -139,7 +133,7 @@ export function QRScanner({ businessId, userId }: { businessId: string; userId?:
     const supabase = createClient()
     const { error: updateError } = await supabase
       .from('bookings')
-      .update({ status: 'checked-in', checked_in_at: new Date().toISOString(), checked_in_by: userId })
+      .update({ status: 'completed', completed_at: new Date().toISOString() })
       .eq('id', result.booking.id)
 
     if (updateError) {
@@ -151,28 +145,27 @@ export function QRScanner({ businessId, userId }: { businessId: string; userId?:
       setResult({
         ...result,
         message: '📡 Queued offline — will sync when connected',
-        booking: { ...result.booking!, status: 'checked-in' },
+        booking: { ...result.booking!, status: 'completed' },
       })
       return
     }
 
     await supabase.from('qr_scans').insert({
       booking_id: result.booking.id,
-      scanned_by: userId,
       action: 'check-in',
     })
 
     if ('Notification' in window && Notification.permission === 'granted') {
-      new Notification('Check-In Successful', {
-        body: `${result.booking.guest_name} has entered.`,
+      new Notification('Session Started', {
+        body: `${result.booking.guest_name} has started their session.`,
         icon: '/favicon.ico',
       })
     }
 
     setResult({
       ...result,
-      message: '✅ Checked in successfully!',
-      booking: { ...result.booking!, status: 'checked-in' },
+      message: '✅ Session started successfully!',
+      booking: { ...result.booking!, status: 'completed' },
     })
   }
 
@@ -187,12 +180,11 @@ export function QRScanner({ businessId, userId }: { businessId: string; userId?:
       await syncQueue(async (item) => {
         const { error } = await supabase
           .from('bookings')
-          .update({ status: 'checked-in', checked_in_at: new Date().toISOString(), checked_in_by: item.scannedBy })
+          .update({ status: 'completed', completed_at: new Date().toISOString() })
           .eq('id', item.bookingId)
         if (error) return false
         await supabase.from('qr_scans').insert({
           booking_id: item.bookingId,
-          scanned_by: item.scannedBy,
           action: 'check-in',
         })
         return true
@@ -260,12 +252,6 @@ export function QRScanner({ businessId, userId }: { businessId: string; userId?:
                 <span className="text-slate-400">Phone</span>
                 <span className="font-semibold">{result.booking.guest_phone}</span>
               </div>
-              {result.booking.car_plate && (
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate-400">Car Plate</span>
-                  <span className="font-semibold">{result.booking.car_plate}</span>
-                </div>
-              )}
               <div className="flex justify-between text-sm">
                 <span className="text-slate-400">Date</span>
                 <span className="font-semibold">{formatDate(result.booking.booking_date)}</span>
@@ -273,10 +259,6 @@ export function QRScanner({ businessId, userId }: { businessId: string; userId?:
               <div className="flex justify-between text-sm">
                 <span className="text-slate-400">Time</span>
                 <span className="font-semibold">{formatTime(result.booking.booking_time)}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-slate-400">Guests</span>
-                <span className="font-semibold">{result.booking.guests}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-slate-400">Status</span>
@@ -290,7 +272,7 @@ export function QRScanner({ businessId, userId }: { businessId: string; userId?:
           <div className="flex flex-col sm:flex-row gap-3">
             {result.valid && result.booking?.status === 'confirmed' && (
               <button onClick={checkIn} className="btn-primary flex-1 justify-center text-lg py-4">
-                ✅ Check In
+                ✅ Start Session
               </button>
             )}
             <button onClick={() => { setResult(null); setError(null) }} className="btn-secondary flex-1 justify-center">

@@ -12,11 +12,11 @@ type Booking = {
   guest_email: string
   booking_date: string
   booking_time: string
-  guests: number
+  total_price: number
   special_requests: string
   status: string
   hash: string
-  checked_in_at: string | null
+  completed_at: string | null
   created_at: string
 }
 
@@ -64,16 +64,17 @@ export default function BookingsPage() {
   }
 
   async function updateStatus(id: string, newStatus: string) {
+    const updates: Record<string, any> = { status: newStatus }
+    if (newStatus === 'completed') {
+      updates.completed_at = new Date().toISOString()
+    }
     const { error } = await supabase
       .from('bookings')
-      .update({
-        status: newStatus,
-        ...(newStatus === 'checked-in' ? { checked_in_at: new Date().toISOString() } : {}),
-      })
+      .update(updates)
       .eq('id', id)
 
     if (!error) {
-      setBookings(prev => prev.map(b => b.id === id ? { ...b, status: newStatus } : b))
+      setBookings(prev => prev.map(b => b.id === id ? { ...b, ...updates } : b))
     }
   }
 
@@ -86,22 +87,22 @@ export default function BookingsPage() {
   }
 
   const exportCSV = () => {
-    const headers = ['Ref', 'Name', 'Phone', 'Email', 'Date', 'Time', 'Guests', 'Status', 'Hash', 'Created']
+    const headers = ['Ref', 'Name', 'Phone', 'Email', 'Date', 'Time', 'Total', 'Status', 'Created']
     const rows = filtered.map(b => [
       b.booking_ref, `"${b.guest_name}"`, b.guest_phone, b.guest_email,
-      b.booking_date, b.booking_time, b.guests, b.status, b.hash, b.created_at
+      b.booking_date, b.booking_time, b.total_price, b.status, b.created_at
     ].join(','))
     const csv = '\uFEFF' + headers.join(',') + '\n' + rows.join('\n')
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
     const link = document.createElement('a')
     link.href = URL.createObjectURL(blob)
-    link.download = `GounaGate-Bookings-${new Date().toISOString().split('T')[0]}.csv`
+    link.download = `ParadiseWorld-Bookings-${new Date().toISOString().split('T')[0]}.csv`
     link.click()
     URL.revokeObjectURL(link.href)
   }
 
   const statusMap: Record<string, string> = {
-    confirmed: 'Confirmed', 'checked-in': 'Checked In', cancelled: 'Cancelled', pending: 'Pending', 'no-show': 'No Show',
+    confirmed: 'Confirmed', completed: 'Completed', cancelled: 'Cancelled', pending: 'Pending',
   }
 
   return (
@@ -136,10 +137,9 @@ export default function BookingsPage() {
         >
           <option value="all">All Status</option>
           <option value="confirmed">Confirmed</option>
-          <option value="checked-in">Checked In</option>
+          <option value="completed">Completed</option>
           <option value="cancelled">Cancelled</option>
           <option value="pending">Pending</option>
-          <option value="no-show">No Show</option>
         </select>
       </div>
 
@@ -161,7 +161,7 @@ export default function BookingsPage() {
                   <th className="p-3 font-medium">Phone</th>
                   <th className="p-3 font-medium">Date</th>
                   <th className="p-3 font-medium">Time</th>
-                  <th className="p-3 font-medium text-center">Guests</th>
+                  <th className="p-3 font-medium text-right">Total</th>
                   <th className="p-3 font-medium">Status</th>
                   <th className="p-3 font-medium">Actions</th>
                 </tr>
@@ -178,7 +178,7 @@ export default function BookingsPage() {
                     <td className="p-3 text-slate-400">{b.guest_phone}</td>
                     <td className="p-3 text-slate-500">{new Date(b.booking_date + 'T12:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</td>
                     <td className="p-3 text-slate-500">{b.booking_time}</td>
-                    <td className="p-3 text-center">{b.guests}</td>
+                    <td className="p-3 text-right font-semibold text-[#D4A843]">{b.total_price.toLocaleString('en-EG')} EGP</td>
                     <td className="p-3">
                       <select
                         value={b.status}

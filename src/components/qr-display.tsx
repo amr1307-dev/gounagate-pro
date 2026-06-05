@@ -8,20 +8,25 @@ type BookingData = {
   booking_ref: string
   guest_name: string
   guest_phone: string
-  car_plate: string
+  guest_email?: string
   booking_date: string
   booking_time: string
-  guests: number
+  total_price?: number
   hash: string
+  special_requests?: string
+  package_id?: string
+  branch_id?: string
 }
 
 export function QRDisplay({
   booking,
-  businessName,
+  packageName,
+  branchName,
   onNew
 }: {
   booking: BookingData
-  businessName: string
+  packageName: string
+  branchName: string
   onNew: () => void
 }) {
   const qrRef = useRef<HTMLDivElement>(null)
@@ -41,10 +46,8 @@ export function QRDisplay({
       ref: booking.booking_ref,
       name: booking.guest_name,
       phone: booking.guest_phone,
-      plate: booking.car_plate,
       date: booking.booking_date,
       time: booking.booking_time,
-      guests: booking.guests,
       hash: booking.hash,
       dynamicHash,
       expiresAt: expiry,
@@ -90,7 +93,7 @@ export function QRDisplay({
       try {
         const c = await html2canvas(qrRef.current!, { backgroundColor: '#ffffff', scale: 3, useCORS: true })
         const link = document.createElement('a')
-        link.download = `GounaGate-${booking.booking_ref}.png`
+        link.download = `ParadiseWorld-${booking.booking_ref}.png`
         link.href = c.toDataURL('image/png')
         link.click()
         return
@@ -98,29 +101,30 @@ export function QRDisplay({
     }
 
     const link = document.createElement('a')
-    link.download = `GounaGate-${booking.booking_ref}.png`
+    link.download = `ParadiseWorld-${booking.booking_ref}.png`
     link.href = canvas.toDataURL('image/png')
     link.click()
   }
 
   const guestWa = () => {
     const msg = encodeURIComponent(
-      `✅ GounaGate Booking Confirmed!\n` +
-      `Ref: ${booking.booking_ref}\nName: ${booking.guest_name}\n` +
-      `Date: ${booking.booking_date}\nTime: ${booking.booking_time}\n` +
-      `Guests: ${booking.guests}\nHash: ${booking.hash}`
+      `✅ Paradise World Booking Confirmed!\n` +
+      `Ref: ${booking.booking_ref}\nService: ${packageName}\nBranch: ${branchName}\n` +
+      `Name: ${booking.guest_name}\nDate: ${booking.booking_date}\nTime: ${booking.booking_time}\n` +
+      `Total: ${booking.total_price?.toLocaleString('en-EG') || ''} EGP\nHash: ${booking.hash}`
     )
     window.open(`https://wa.me/${getEgyptPhone(booking.guest_phone)}?text=${msg}`, '_blank')
   }
 
   const ownerWa = () => {
     const msg = encodeURIComponent(
-      `🆕 New Booking - ${businessName}\n` +
-      `Ref: ${booking.booking_ref}\nGuest: ${booking.guest_name}\n` +
-      `Phone: ${booking.guest_phone}\nDate: ${booking.booking_date} at ${booking.booking_time}\n` +
-      `Guests: ${booking.guests}\nStatus: Confirmed`
+      `🆕 New Booking - Paradise World\n` +
+      `Ref: ${booking.booking_ref}\nService: ${packageName}\nBranch: ${branchName}\n` +
+      `Guest: ${booking.guest_name}\nPhone: ${booking.guest_phone}\n` +
+      `Date: ${booking.booking_date} at ${booking.booking_time}\n` +
+      `Total: ${booking.total_price?.toLocaleString('en-EG') || ''} EGP\nStatus: Confirmed`
     )
-    window.open(`https://wa.me/201028803080?text=${msg}`, '_blank')
+    window.open(`https://wa.me/201019382288?text=${msg}`, '_blank')
   }
 
   const formatDate = (d: string) => {
@@ -149,12 +153,13 @@ export function QRDisplay({
 
         <div className="bg-slate-50 rounded-xl p-4 mb-6 space-y-2 border border-slate-100">
           <SummaryRow label="Ref" value={booking.booking_ref} badge />
+          <SummaryRow label="Service" value={packageName} />
+          <SummaryRow label="Branch" value={branchName} />
           <SummaryRow label="Name" value={booking.guest_name} />
           <SummaryRow label="Phone" value={booking.guest_phone} />
-          {booking.car_plate && <SummaryRow label="Car Plate" value={booking.car_plate} />}
           <SummaryRow label="Date" value={formatDate(booking.booking_date)} />
           <SummaryRow label="Time" value={booking.booking_time} />
-          <SummaryRow label="Guests" value={`${booking.guests} ${booking.guests === 1 ? 'guest' : 'guests'}`} />
+          <SummaryRow label="Total" value={`${booking.total_price?.toLocaleString('en-EG') || ''} EGP`} />
           <SummaryRow label="Hash" value={booking.hash} mono />
           <SummaryRow label="Dynamic" value={generateTimeBasedHash(booking.id, booking.hash)} mono />
         </div>
@@ -167,7 +172,7 @@ export function QRDisplay({
             📱 Send to Guest
           </button>
           <button onClick={ownerWa} className="btn-secondary flex-1 justify-center">
-            📲 Notify Owner
+            📲 Notify Spa
           </button>
           <button onClick={onNew} className="btn-secondary flex-1 justify-center">
             ➕ New Booking

@@ -9,12 +9,12 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 const cairo = Cairo({ subsets: ['arabic'], variable: '--font-cairo' })
 
 export const metadata: Metadata = {
-  title: 'GounaGate - Smart Booking & QR Entry System',
-  description: 'Smart booking and QR gate entry system for El Gouna businesses. Reserve your spot instantly with QR confirmation.',
-  keywords: 'El Gouna, booking, QR, gate entry, reservation, Egypt, GounaGate',
+  title: 'Paradise World Hurghada - Premium Spa & Wellness',
+  description: 'Book your premium spa experience at Paradise World Hurghada. Massage, salt cave, sauna, beauty treatments and more. Instant QR booking confirmation.',
+  keywords: 'Paradise World, Hurghada, spa, massage, salt cave, sauna, beauty, wellness, Egypt, booking',
   openGraph: {
-    title: 'GounaGate - Smart Booking',
-    description: 'Book your entry to El Gouna venues with instant QR confirmation.',
+    title: 'Paradise World Hurghada - Premium Spa',
+    description: 'Book your premium spa experience with instant QR confirmation.',
     type: 'website',
   },
 }
@@ -27,7 +27,7 @@ export default function RootLayout({
   return (
     <html lang="en" dir="ltr" className={`${inter.variable} ${cairo.variable}`}>
       <head>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%230A6E74'/><path d='M8 16L14 22L24 10' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/></svg>" />
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23B8860B'/><path d='M16 6C12 6 8 10 8 16C8 22 12 26 16 26C20 26 24 22 24 16' stroke='white' stroke-width='3' stroke-linecap='round' fill='none'/><circle cx='16' cy='16' r='4' fill='white'/></svg>" />
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#0A6E74" />
         <meta name="apple-mobile-web-app-capable" content="yes" />

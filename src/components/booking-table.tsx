@@ -5,7 +5,7 @@ type Booking = {
   guest_phone: string
   booking_date: string
   booking_time: string
-  guests: number
+  total_price?: number
   status: string
 }
 
@@ -33,7 +33,7 @@ export function BookingTable({ bookings, compact }: { bookings: Booking[]; compa
             {!compact && <th className="pb-3 font-medium pr-4">Phone</th>}
             <th className="pb-3 font-medium pr-4">Date</th>
             <th className="pb-3 font-medium pr-4">Time</th>
-            <th className="pb-3 font-medium pr-4 text-center">Guests</th>
+            <th className="pb-3 font-medium pr-4 text-right">Total</th>
             <th className="pb-3 font-medium">Status</th>
           </tr>
         </thead>
@@ -49,9 +49,9 @@ export function BookingTable({ bookings, compact }: { bookings: Booking[]; compa
               {!compact && <td className="py-3 pr-4 text-slate-400">{b.guest_phone}</td>}
               <td className="py-3 pr-4 text-slate-500">{formatDate(b.booking_date)}</td>
               <td className="py-3 pr-4 text-slate-500">{b.booking_time}</td>
-              <td className="py-3 pr-4 text-center">{b.guests}</td>
+              <td className="py-3 pr-4 text-right font-semibold text-[#D4A843]">{b.total_price?.toLocaleString('en-EG') || ''} EGP</td>
               <td className="py-3">
-                <span className={`status-badge ${b.status}`}>{b.status}</span>
+                <span className={`status-badge ${b.status}`}>{b.status === 'completed' ? 'Completed' : b.status}</span>
               </td>
             </tr>
           ))}

@@ -1,8 +1,7 @@
 type Stats = {
   total: number
   todayCount: number
-  checkedIn: number
-  capacity: number
+  completed: number
 }
 
 export function StatsCards({ stats }: { stats: Stats }) {
@@ -23,15 +22,15 @@ export function StatsCards({ stats }: { stats: Stats }) {
         bg="bg-blue-50"
       />
       <StatCard
-        label="Checked In"
-        value={stats.checkedIn}
+        label="Completed"
+        value={stats.completed}
         icon="✅"
         color="text-emerald-600"
         bg="bg-emerald-50"
       />
       <StatCard
-        label="Active Bookings"
-        value={stats.total - stats.checkedIn}
+        label="Upcoming"
+        value={stats.total - stats.completed}
         icon="🟢"
         color="text-amber-600"
         bg="bg-amber-50"

@@ -7,7 +7,9 @@
     --primary: #0A6E74;
     --primary-light: #0FA3B1;
     --primary-dark: #065256;
-    --accent: #0D9488;
+    --accent: #D4A843;
+    --accent-light: #E8C96A;
+    --accent-dark: #B8860B;
     --background: #F0FDF9;
     --card-bg: rgba(255, 255, 255, 0.88);
     --card-bg-solid: #ffffff;
@@ -62,8 +64,15 @@
     background-clip: text;
   }
 
+  .text-gradient-gold {
+    background: linear-gradient(135deg, var(--accent), var(--accent-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
   .btn-primary {
-    background: var(--primary);
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
     color: white;
     min-height: 48px;
     padding: 12px 28px;
@@ -79,9 +88,29 @@
   }
 
   .btn-primary:hover {
-    background: var(--primary-dark);
     transform: translateY(-1px);
     box-shadow: 0 4px 16px rgba(10, 110, 116, 0.35);
+  }
+
+  .btn-gold {
+    background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+    color: white;
+    min-height: 48px;
+    padding: 12px 28px;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .btn-gold:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(184, 134, 11, 0.35);
   }
 
   .btn-secondary {
@@ -134,61 +163,41 @@
     font-weight: 600;
   }
 
-  .status-badge.confirmed {
-    background: #D1FAE5;
-    color: #065F46;
-  }
-
-  .status-badge.checked-in {
-    background: #DBEAFE;
-    color: #1E40AF;
-  }
-
-  .status-badge.cancelled {
-    background: #FEE2E2;
-    color: #991B1B;
-  }
-
-  .status-badge.pending {
-    background: #FEF3C7;
-    color: #92400E;
-  }
-
-  .status-badge.no-show {
-    background: #F1F5F9;
-    color: #475569;
-  }
+  .status-badge.confirmed { background: #D1FAE5; color: #065F46; }
+  .status-badge.completed { background: #DBEAFE; color: #1E40AF; }
+  .status-badge.cancelled { background: #FEE2E2; color: #991B1B; }
+  .status-badge.pending { background: #FEF3C7; color: #92400E; }
 
   @keyframes slideUp {
-    from {
-      opacity: 0;
-      transform: translateY(24px) scale(0.96);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
+    from { opacity: 0; transform: translateY(24px) scale(0.96); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
   }
-
-  .animate-slide-up {
-    animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  }
+  .animate-slide-up { animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
 
   @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
   }
+  .animate-fade-in { animation: fadeIn 0.3s ease; }
 
-  .animate-fade-in {
-    animation: fadeIn 0.3s ease;
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
   }
+  .animate-float { animation: float 3s ease-in-out infinite; }
+
+  @keyframes pulse-soft {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+  }
+  .animate-pulse-soft { animation: pulse-soft 2s ease-in-out infinite; }
 }
 
-/* Hero & Flow Diagram */
-.hero-gradient {
-  background: radial-gradient(ellipse at 50% 0%, rgba(10, 110, 116, 0.08) 0%, transparent 60%),
-              radial-gradient(ellipse at 80% 50%, rgba(15, 163, 177, 0.06) 0%, transparent 50%),
-              radial-gradient(ellipse at 20% 80%, rgba(13, 148, 136, 0.04) 0%, transparent 40%);
+/* Hero */
+.hero-gradient-paradise {
+  background: radial-gradient(ellipse at 30% 0%, rgba(10, 110, 116, 0.10) 0%, transparent 60%),
+              radial-gradient(ellipse at 70% 30%, rgba(212, 168, 67, 0.08) 0%, transparent 50%),
+              radial-gradient(ellipse at 50% 100%, rgba(15, 163, 177, 0.05) 0%, transparent 40%);
 }
 
 .mockup-card {
@@ -207,128 +216,43 @@
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.06), 0 4px 20px rgba(10, 110, 116, 0.08);
 }
 
-/* Hide scrollbar for carousel */
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+.scrollbar-hide::-webkit-scrollbar { display: none; }
 
-/* Stats Bar */
-.stat-item {
-  text-align: center;
-  padding: 1rem;
-}
-
-.stat-number {
-  font-size: 2rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, var(--primary), var(--primary-light));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  line-height: 1;
-}
-
-.stat-label {
-  font-size: 0.8rem;
-  color: #94A3B8;
-  margin-top: 4px;
-}
-
-/* Feature Card Premium */
 .feature-card {
-  background: var(--card-bg-solid);
-  border: 1px solid #E2E8F0;
-  border-radius: var(--radius);
-  padding: 1.5rem;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  overflow: hidden;
+  background: var(--card-bg-solid); border: 1px solid #E2E8F0; border-radius: var(--radius);
+  padding: 1.5rem; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden;
 }
-
 .feature-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, var(--primary), var(--primary-light));
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  transform: scaleX(0); transform-origin: left; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
-
-.feature-card:hover::before {
-  transform: scaleX(1);
-}
-
+.feature-card:hover::before { transform: scaleX(1); }
 .feature-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(10, 110, 116, 0.08);
+  transform: translateY(-2px); box-shadow: 0 8px 30px rgba(10, 110, 116, 0.08);
   border-color: rgba(10, 110, 116, 0.15);
 }
+.feature-icon { width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 1rem; }
 
-.feature-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
-  margin-bottom: 1rem;
-}
-
-/* Trust Badge */
 .trust-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 14px;
-  border-radius: 50px;
-  font-size: 13px;
-  background: rgba(10, 110, 116, 0.08);
-  color: var(--primary);
-  font-weight: 500;
+  display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px;
+  border-radius: 50px; font-size: 13px; background: rgba(212, 168, 67, 0.12);
+  color: var(--accent-dark); font-weight: 500;
 }
 
-/* QR Scanner */
-#qr-scanner-container video {
-  width: 100% !important;
-  max-width: 500px !important;
-  border-radius: 16px !important;
+.price-tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 1.5rem; font-weight: 800;
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
 }
 
-#qr-scanner-container section {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-}
+#qr-scanner-container video { width: 100% !important; max-width: 500px !important; border-radius: 16px !important; }
+#qr-scanner-container section { display: flex !important; flex-direction: column !important; align-items: center !important; }
+#qr-scanner-container section div:last-child { text-align: center !important; padding: 8px !important; }
 
-#qr-scanner-container section div:last-child {
-  text-align: center !important;
-  padding: 8px !important;
-}
-
-/* Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #94A3B8;
-}
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #94A3B8; }

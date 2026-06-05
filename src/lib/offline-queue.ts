@@ -1,4 +1,4 @@
-const DB_NAME = 'gounagate-offline'
+const DB_NAME = 'paradise-world-offline'
 const DB_VERSION = 1
 const STORE = 'checkin-queue'
 

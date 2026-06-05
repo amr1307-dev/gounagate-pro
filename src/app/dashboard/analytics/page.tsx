@@ -7,10 +7,9 @@ import {
 } from 'recharts'
 
 type Stats = {
-  dailyStats: { date: string; total: number; checkedIn: number }[]
+  dailyStats: { date: string; total: number; completed: number }[]
   peakHours: { hour: number; count: number }[]
   statusBreakdown: { name: string; value: number }[]
-  currentOccupancy: { current: number; max: number }
 }
 
 const COLORS = ['#0A6E74', '#10B981', '#EF4444', '#F59E0B']
@@ -38,8 +37,6 @@ export default function AnalyticsPage() {
     return <div className="text-center py-16 text-slate-500">Failed to load analytics</div>
   }
 
-  const occPct = Math.round((stats.currentOccupancy.current / stats.currentOccupancy.max) * 100)
-
   return (
     <div className="space-y-6">
       <div>
@@ -47,36 +44,12 @@ export default function AnalyticsPage() {
         <p className="text-sm text-slate-500 mt-1">Booking trends and performance metrics</p>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <OccupancyGauge pct={occPct} current={stats.currentOccupancy.current} max={stats.currentOccupancy.max} />
+      <div className="grid gap-6 md:grid-cols-2">
         <PeakHoursChart data={stats.peakHours} />
         <StatusPie data={stats.statusBreakdown} />
       </div>
 
       <DailyTrendChart data={stats.dailyStats} />
-    </div>
-  )
-}
-
-function OccupancyGauge({ pct, current, max }: { pct: number; current: number; max: number }) {
-  return (
-    <div className="glass p-6 text-center">
-      <h3 className="font-semibold text-slate-900 mb-2">Today&apos;s Occupancy</h3>
-      <div className="relative inline-flex items-center justify-center">
-        <svg width="140" height="140" className="-rotate-90">
-          <circle cx="70" cy="70" r="56" fill="none" stroke="#e2e8f0" strokeWidth="10" />
-          <circle
-            cx="70" cy="70" r="56" fill="none"
-            stroke={pct > 80 ? '#EF4444' : pct > 60 ? '#F59E0B' : '#10B981'}
-            strokeWidth="10"
-            strokeDasharray={`${2 * Math.PI * 56}`}
-            strokeDashoffset={`${2 * Math.PI * 56 * (1 - pct / 100)}`}
-            strokeLinecap="round"
-          />
-        </svg>
-        <span className="absolute text-2xl font-bold text-slate-900">{pct}%</span>
-      </div>
-      <p className="text-sm text-slate-500 mt-2">{current} / {max} capacity</p>
     </div>
   )
 }
@@ -116,7 +89,7 @@ function StatusPie({ data }: { data: { name: string; value: number }[] }) {
   )
 }
 
-function DailyTrendChart({ data }: { data: { date: string; total: number; checkedIn: number }[] }) {
+function DailyTrendChart({ data }: { data: { date: string; total: number; completed: number }[] }) {
   return (
     <div className="glass p-6">
       <h3 className="font-semibold text-slate-900 mb-4">14-Day Trend</h3>
@@ -127,7 +100,7 @@ function DailyTrendChart({ data }: { data: { date: string; total: number; checke
           <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
           <Tooltip />
           <Line type="monotone" dataKey="total" stroke="#0A6E74" strokeWidth={2} dot={{ r: 3 }} name="Bookings" />
-          <Line type="monotone" dataKey="checkedIn" stroke="#10B981" strokeWidth={2} dot={{ r: 3 }} name="Checked In" />
+          <Line type="monotone" dataKey="completed" stroke="#10B981" strokeWidth={2} dot={{ r: 3 }} name="Completed" />
         </LineChart>
       </ResponsiveContainer>
     </div>

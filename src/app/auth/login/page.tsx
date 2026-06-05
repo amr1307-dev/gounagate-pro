@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
 
 export default function LoginPage() {
@@ -38,8 +37,8 @@ export default function LoginPage() {
       <div className="glass p-8 w-full max-w-md">
         <div className="text-center mb-8">
           <div className="text-4xl mb-3">🔐</div>
-          <h1 className="text-2xl font-bold text-slate-900">Welcome Back</h1>
-          <p className="text-slate-500 text-sm mt-1">Sign in to your GounaGate dashboard</p>
+          <h1 className="text-2xl font-bold text-slate-900">Admin Login</h1>
+          <p className="text-slate-500 text-sm mt-1">Sign in to Paradise World dashboard</p>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-4">
@@ -76,17 +75,10 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <p className="text-center text-sm text-slate-400 mt-6">
-          Don&apos;t have an account?{' '}
-          <Link href="/auth/signup" className="text-[#0A6E74] font-medium hover:underline">
-            Sign up
-          </Link>
-        </p>
-
         <div className="mt-6 pt-6 border-t border-slate-100 text-center">
-          <Link href="/book/demo" className="text-sm text-slate-400 hover:text-slate-600">
-            ← Try demo booking instead
-          </Link>
+          <a href="/" className="text-sm text-slate-400 hover:text-slate-600">
+            ← Back to home
+          </a>
         </div>
       </div>
     </div>

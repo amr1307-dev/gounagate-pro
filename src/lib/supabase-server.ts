@@ -41,7 +41,7 @@ export async function getUserProfile() {
   const supabase = await createServerSupabase()
   const { data } = await supabase
     .from('profiles')
-    .select('*, businesses(*)')
+    .select('*')
     .eq('id', user.id)
     .single()
 

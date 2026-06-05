@@ -5,10 +5,9 @@ export async function GET() {
   const supabase = await createServerSupabase()
 
   const { data, error } = await supabase
-    .from('businesses')
-    .select('id, name, slug, logo_url, primary_color, is_active')
-    .eq('is_active', true)
-    .order('name')
+    .from('categories')
+    .select('*')
+    .order('sort_order')
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })

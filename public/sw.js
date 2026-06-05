@@ -1,4 +1,4 @@
-const CACHE = 'gounagate-v1'
+const CACHE = 'paradise-world-v1'
 const CACHEABLE = [
   '/',
   '/auth/login',

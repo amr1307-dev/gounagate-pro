@@ -32,28 +32,21 @@ export function Navbar() {
       <div className="mx-auto flex h-full max-w-7xl items-center justify-between px-4 sm:px-6">
         <Link href={isDashboard ? '/dashboard' : '/'} className="flex items-center gap-2 font-bold text-lg">
           <svg viewBox="0 0 32 32" fill="none" className="size-7">
-            <rect width="32" height="32" rx="8" fill="#0A6E74"/>
-            <path d="M8 16L14 22L24 10" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+            <rect width="32" height="32" rx="8" fill="#B8860B"/>
+            <path d="M16 6C12 6 8 10 8 16C8 22 12 26 16 26C20 26 24 22 24 16' stroke='white' strokeWidth='3' strokeLinecap='round' fill='none"/>
+            <circle cx="16" cy="16" r="4" fill="white"/>
           </svg>
-          {isDashboard ? 'GounaGate Pro' : 'GounaGate'}
+          {isDashboard ? 'Paradise World' : 'Paradise World'}
         </Link>
 
         <div className="flex items-center gap-2">
           {isPublic && (
-            <>
-              <Link href="/auth/login" className={cn(
-                'px-4 py-2 rounded-lg text-sm font-medium transition',
-                'hover:bg-slate-100'
-              )}>
-                {lang === 'en' ? 'Login' : 'تسجيل الدخول'}
-              </Link>
-              <Link
-                href="/auth/signup"
-                className="px-4 py-2 rounded-lg text-sm font-medium bg-[#0A6E74] text-white hover:bg-[#065256] transition"
-              >
-                {lang === 'en' ? 'Sign Up' : 'إنشاء حساب'}
-              </Link>
-            </>
+            <Link
+              href="/auth/login"
+              className="px-4 py-2 rounded-lg text-sm font-medium bg-[#0A6E74] text-white hover:bg-[#065256] transition"
+            >
+              {lang === 'en' ? 'Admin Login' : 'تسجيل الدخول'}
+            </Link>
           )}
 
           {isDashboard && (

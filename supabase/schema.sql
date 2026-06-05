@@ -1,49 +1,80 @@
--- GounaGate Pro Database Schema
+-- Paradise World Hurghada Database Schema
 
--- Enable UUID extension
 create extension if not exists "uuid-ossp";
 
--- Businesses (multi-tenant)
-create table if not exists businesses (
+-- Categories (Massage, Spa, Salt Cave, Beauty, Sauna)
+create table if not exists categories (
   id uuid primary key default gen_random_uuid(),
-  name text not null,
+  name_en text not null,
+  name_ar text not null,
   slug text unique not null,
-  logo_url text,
-  primary_color text default '#0A6E74',
-  whatsapp_owner text default '201028803080',
-  max_capacity int default 100,
-  working_hours jsonb default '{}'::jsonb,
+  icon text default '💆',
+  sort_order int default 0,
+  created_at timestamptz default now()
+);
+
+-- Packages / Services
+create table if not exists packages (
+  id uuid primary key default gen_random_uuid(),
+  category_id uuid references categories on delete cascade,
+  name_en text not null,
+  name_ar text not null,
+  description_en text,
+  description_ar text,
+  price decimal(10,2) not null,
+  duration_minutes int not null,
+  image_url text,
   is_active boolean default true,
   created_at timestamptz default now()
 );
 
--- User profiles (linked to Supabase Auth)
+-- Branches
+create table if not exists branches (
+  id uuid primary key default gen_random_uuid(),
+  name_en text not null,
+  name_ar text not null,
+  address text default '',
+  is_active boolean default true,
+  created_at timestamptz default now()
+);
+
+-- Testimonials
+create table if not exists testimonials (
+  id uuid primary key default gen_random_uuid(),
+  client_name text not null,
+  rating int not null check (rating >= 1 and rating <= 5),
+  comment_en text not null,
+  comment_ar text default '',
+  client_country text default '',
+  avatar_url text,
+  is_visible boolean default true,
+  created_at timestamptz default now()
+);
+
+-- User profiles (single admin)
 create table if not exists profiles (
   id uuid primary key references auth.users on delete cascade,
-  business_id uuid references businesses on delete cascade,
-  role text not null default 'owner' check (role in ('owner','receptionist','gatekeeper','viewer')),
   full_name text,
   phone text,
   created_at timestamptz default now()
 );
 
--- Bookings
+-- Bookings (simplified for spa)
 create table if not exists bookings (
   id uuid primary key default gen_random_uuid(),
-  business_id uuid references businesses not null,
   booking_ref text unique not null,
+  package_id uuid references packages,
+  branch_id uuid references branches,
   guest_name text not null,
   guest_phone text not null,
-  guest_email text,
+  guest_email text default '',
   booking_date date not null,
   booking_time time not null,
-  guests int not null check (guests between 1 and 50),
+  total_price decimal(10,2) default 0,
   special_requests text default '',
-  car_plate text default '',
   hash text not null,
-  status text not null default 'confirmed' check (status in ('pending','confirmed','checked-in','cancelled','no-show')),
-  checked_in_at timestamptz,
-  checked_in_by uuid references profiles,
+  status text not null default 'confirmed' check (status in ('pending','confirmed','completed','cancelled')),
+  completed_at timestamptz,
   created_at timestamptz default now()
 );
 
@@ -51,7 +82,6 @@ create table if not exists bookings (
 create table if not exists qr_scans (
   id uuid primary key default gen_random_uuid(),
   booking_id uuid references bookings on delete cascade,
-  scanned_by uuid references profiles,
   action text not null check (action in ('verify','check-in','reject')),
   details jsonb default '{}'::jsonb,
   scanned_at timestamptz default now()
@@ -60,7 +90,6 @@ create table if not exists qr_scans (
 -- Activity log
 create table if not exists activity_logs (
   id uuid primary key default gen_random_uuid(),
-  business_id uuid references businesses not null,
   user_id uuid references profiles,
   action text not null,
   entity_type text,
@@ -69,162 +98,95 @@ create table if not exists activity_logs (
   created_at timestamptz default now()
 );
 
--- Invites (self-registration links)
-create table if not exists invites (
-  id uuid primary key default gen_random_uuid(),
-  business_id uuid references businesses not null,
-  slug text unique not null,
-  description text default '',
-  max_uses int default 0,
-  use_count int default 0,
-  is_active boolean default true,
-  expires_at timestamptz,
-  created_at timestamptz default now(),
-  created_by uuid references profiles
-);
-
-create index if not exists idx_invites_slug on invites(slug);
-
-alter table invites enable row level security;
-
-create policy "Business members can read invites"
-  on invites for select
-  using (
-    business_id in (select business_id from profiles where id = auth.uid())
-  );
-
-create policy "Business members can insert invites"
-  on invites for insert
-  with check (
-    business_id in (select business_id from profiles where id = auth.uid())
-  );
-
-create policy "Business members can update invites"
-  on invites for update
-  using (
-    business_id in (select business_id from profiles where id = auth.uid())
-  );
-
-create policy "Public can read active invite"
-  on invites for select
-  using (is_active = true);
-
 -- Indexes
-create index if not exists idx_bookings_business_date on bookings(business_id, booking_date);
+create index if not exists idx_bookings_date on bookings(booking_date);
 create index if not exists idx_bookings_status on bookings(status);
 create index if not exists idx_bookings_ref on bookings(booking_ref);
 create index if not exists idx_bookings_phone on bookings(guest_phone);
-create index if not exists idx_profiles_business on profiles(business_id);
+create index if not exists idx_packages_category on packages(category_id);
 create index if not exists idx_qr_scans_booking on qr_scans(booking_id);
 
 -- Enable RLS
-alter table businesses enable row level security;
+alter table categories enable row level security;
+alter table packages enable row level security;
+alter table branches enable row level security;
+alter table testimonials enable row level security;
 alter table profiles enable row level security;
 alter table bookings enable row level security;
 alter table qr_scans enable row level security;
 alter table activity_logs enable row level security;
 
--- RLS Policies
-
-drop policy if exists "Users can read own business" on businesses;
-drop policy if exists "Public can read active businesses" on businesses;
-drop policy if exists "Users can insert businesses" on businesses;
+-- Drop existing policies for clean re-runs
+drop policy if exists "Public can read categories" on categories;
+drop policy if exists "Public can read active packages" on packages;
+drop policy if exists "Public can read branches" on branches;
+drop policy if exists "Public can read visible testimonials" on testimonials;
 drop policy if exists "Users can read own profile" on profiles;
 drop policy if exists "Users can insert own profile" on profiles;
-drop policy if exists "Business members can read bookings" on bookings;
-drop policy if exists "Business members can insert bookings" on bookings;
 drop policy if exists "Public can insert bookings" on bookings;
-drop policy if exists "Business members can update bookings" on bookings;
-drop policy if exists "Business members can read invites" on invites;
-drop policy if exists "Business members can insert invites" on invites;
-drop policy if exists "Business members can update invites" on invites;
-drop policy if exists "Public can read active invite" on invites;
+drop policy if exists "Admin can read all bookings" on bookings;
+drop policy if exists "Admin can update bookings" on bookings;
+drop policy if exists "Admin can delete bookings" on bookings;
+drop policy if exists "Admin can read activity logs" on activity_logs;
+drop policy if exists "Admin can insert activity logs" on activity_logs;
+drop policy if exists "Admin can read qr_scans" on qr_scans;
+drop policy if exists "Admin can insert qr_scans" on qr_scans;
 
--- Businesses: owners can read their own
-create policy "Users can read own business"
-  on businesses for select
-  using (
-    id in (
-      select business_id from profiles where id = auth.uid()
-    )
-  );
+-- RLS: Public read for catalog data
+create policy "Public can read categories"
+  on categories for select using (true);
 
--- Businesses: public can read active
-create policy "Public can read active businesses"
-  on businesses for select
-  using (is_active = true);
+create policy "Public can read active packages"
+  on packages for select using (is_active = true);
 
--- Businesses: authenticated users can insert (for signup)
-create policy "Users can insert businesses"
-  on businesses for insert
-  with check (auth.role() = 'authenticated');
+create policy "Public can read branches"
+  on branches for select using (is_active = true);
 
--- Profiles: users can read own
+create policy "Public can read visible testimonials"
+  on testimonials for select using (is_visible = true);
+
+-- RLS: Profiles
 create policy "Users can read own profile"
-  on profiles for select
-  using (id = auth.uid());
+  on profiles for select using (id = auth.uid());
 
--- Profiles: users can insert own profile (for signup)
 create policy "Users can insert own profile"
-  on profiles for insert
-  with check (id = auth.uid());
+  on profiles for insert with check (id = auth.uid());
 
--- Bookings: business members can read
-create policy "Business members can read bookings"
-  on bookings for select
-  using (
-    business_id in (
-      select business_id from profiles where id = auth.uid()
-    )
-  );
-
--- Bookings: business members can insert
-create policy "Business members can insert bookings"
-  on bookings for insert
-  with check (
-    business_id in (
-      select business_id from profiles where id = auth.uid()
-    )
-  );
-
--- Bookings: public can insert (for booking form)
+-- RLS: Bookings
 create policy "Public can insert bookings"
-  on bookings for insert
-  with check (true);
+  on bookings for insert with check (true);
 
--- Bookings: business members can update
-create policy "Business members can update bookings"
+create policy "Admin can read all bookings"
+  on bookings for select
+  using (auth.role() = 'authenticated');
+
+create policy "Admin can update bookings"
   on bookings for update
-  using (
-    business_id in (
-      select business_id from profiles where id = auth.uid()
-    )
-  );
+  using (auth.role() = 'authenticated');
 
--- Invite increment function
-create or replace function increment_invite_use(p_slug text)
-returns jsonb
-language plpgsql
-security definer
-as $$
-declare
-  v_invite invites;
-begin
-  update invites
-  set use_count = use_count + 1
-  where slug = p_slug and is_active = true
-  returning * into v_invite;
+create policy "Admin can delete bookings"
+  on bookings for delete
+  using (auth.role() = 'authenticated');
 
-  if not found then
-    return jsonb_build_object('success', false, 'message', 'Invite not found or inactive');
-  end if;
+-- RLS: Activity logs
+create policy "Admin can read activity logs"
+  on activity_logs for select
+  using (auth.role() = 'authenticated');
 
-  return jsonb_build_object('success', true, 'use_count', v_invite.use_count);
-end;
-$$;
+create policy "Admin can insert activity logs"
+  on activity_logs for insert
+  using (auth.role() = 'authenticated');
 
--- Functions
+-- RLS: QR scans
+create policy "Admin can read qr_scans"
+  on qr_scans for select
+  using (auth.role() = 'authenticated');
 
+create policy "Admin can insert qr_scans"
+  on qr_scans for insert
+  using (auth.role() = 'authenticated');
+
+-- Verify booking function
 create or replace function verify_booking(p_booking_id uuid, p_hash text)
 returns jsonb
 language plpgsql
@@ -245,22 +207,15 @@ begin
     return jsonb_build_object('valid', false, 'message', 'Booking was cancelled');
   end if;
 
-  if v_booking.status = 'checked-in' then
-    return jsonb_build_object(
-      'valid', true,
-      'message', 'Already checked in',
-      'booking', row_to_json(v_booking)::jsonb
-    );
+  if v_booking.status = 'completed' then
+    return jsonb_build_object('valid', true, 'message', 'Already completed');
   end if;
 
-  return jsonb_build_object(
-    'valid', true,
-    'message', 'Booking verified',
-    'booking', row_to_json(v_booking)::jsonb
-  );
+  return jsonb_build_object('valid', true, 'message', 'Booking verified');
 end;
 $$;
 
+-- Check-in booking function
 create or replace function check_in_booking(p_booking_id uuid, p_user_id uuid)
 returns jsonb
 language plpgsql
@@ -270,20 +225,55 @@ declare
   v_booking bookings;
 begin
   update bookings
-  set status = 'checked-in',
-      checked_in_at = now(),
-      checked_in_by = p_user_id
+  set status = 'completed',
+      completed_at = now()
   where id = p_booking_id
     and status = 'confirmed'
   returning * into v_booking;
 
   if not found then
-    return jsonb_build_object('success', false, 'message', 'Booking not found or already checked in');
+    return jsonb_build_object('success', false, 'message', 'Booking not found or already completed');
   end if;
 
-  insert into qr_scans (booking_id, scanned_by, action)
-  values (p_booking_id, p_user_id, 'check-in');
+  insert into qr_scans (booking_id, action)
+  values (p_booking_id, 'check-in');
 
-  return jsonb_build_object('success', true, 'booking', row_to_json(v_booking)::jsonb);
+  return jsonb_build_object('success', true);
 end;
 $$;
+
+-- Seed data
+insert into branches (name_en, name_ar, address) values
+  ('Corniche', 'الكورنيش', 'Corniche Road, Hurghada, Egypt'),
+  ('Florenza Khamsin', 'فلورنزا خماسين', 'Florenza Khamsin Resort, Hurghada, Egypt')
+on conflict do nothing;
+
+insert into categories (name_en, name_ar, slug, icon, sort_order) values
+  ('Spa', 'سبا', 'spa', '💆', 1),
+  ('Massage', 'مساج', 'massage', '💪', 2),
+  ('Salt Cave', 'كهف الملح', 'salt-cave', '🧂', 3),
+  ('Beauty', 'تجميل', 'beauty', '💄', 4),
+  ('Sauna', 'ساونا', 'sauna', '🧖', 5)
+on conflict do nothing;
+
+insert into packages (category_id, name_en, name_ar, description_en, description_ar, price, duration_minutes) values
+  ((select id from categories where slug = 'spa'), 'Royal Spa Package', 'الباقة الملكية للسبا', 'Full body treatment with essential oils, steam room, and relaxation area', 'علاج كامل للجسم بالزيوت العطرية مع غرفة بخار ومنطقة استرخاء', 1500, 120),
+  ((select id from categories where slug = 'spa'), 'Couples Spa Retreat', 'سبا للأزواج', 'Side-by-side massage and spa treatment for two', 'مساج وعلاج سبا معاً لشخصين', 2500, 90),
+  ((select id from categories where slug = 'massage'), 'Swedish Massage', 'مساج سويدي', 'Classic relaxation massage with long flowing strokes', 'مساج استرخاء كلاسيكي بحركات طويلة', 600, 60),
+  ((select id from categories where slug = 'massage'), 'Hot Stone Massage', 'مساج بالأحجار الساخنة', 'Deep tissue massage with heated basalt stones', 'مساج عميق للأنسجة بأحجار البازلت الساخنة', 800, 75),
+  ((select id from categories where slug = 'massage'), 'Thai Massage', 'مساج تايلندي', 'Traditional Thai yoga massage with stretching', 'مساج يوجا تايلندي تقليدي مع تمارين شد', 700, 60),
+  ((select id from categories where slug = 'salt-cave'), 'Salt Cave Session', 'جلسة كهف الملح', 'Halotherapy session in our natural salt cave', 'جلسة علاج بالملح في كهف الملح الطبيعي', 400, 45),
+  ((select id from categories where slug = 'salt-cave'), 'Salt Cave + Massage', 'كهف الملح + مساج', 'Salt cave therapy followed by a full body massage', 'جلسة كهف ملح يتبعها مساج كامل للجسم', 900, 90),
+  ((select id from categories where slug = 'beauty'), 'Facial Treatment', 'علاج بشرة', 'Deep cleansing facial with natural masks', 'تنظيف عميق للبشرة بأقنعة طبيعية', 500, 45),
+  ((select id from categories where slug = 'beauty'), 'Manicure & Pedicure', 'مانيكير وباديكير', 'Complete nail care and polish', 'عناية كاملة بالأظافر والطلاء', 450, 60),
+  ((select id from categories where slug = 'sauna'), 'Sauna Session', 'جلسة ساونا', 'Traditional Finnish sauna experience', 'تجربة ساونا فنلندية تقليدية', 350, 30),
+  ((select id from categories where slug = 'sauna'), 'Steam Room', 'غرفة بخار', 'Aromatic steam bath for detoxification', 'حمام بخار عطري لإزالة السموم', 300, 30)
+on conflict do nothing;
+
+insert into testimonials (client_name, rating, comment_en, comment_ar, client_country) values
+  ('Sarah Johnson', 5, 'The best spa experience in Hurghada! The salt cave is incredible.', 'أفضل تجربة سبا في الغردقة! كهف الملح رائع.', 'UK'),
+  ('Ahmed Mahmoud', 5, 'Professional staff, clean facilities, amazing massage. Will definitely come back.', 'طاقم محترف، مرافق نظيفة، مساج رائع. سأعود بالتأكيد.', 'Egypt'),
+  ('Elena Petrova', 4, 'Wonderful couple spa treatment. Very romantic and relaxing.', 'علاج سبا رائع للأزواج. رومانسي ومريح جداً.', 'Russia'),
+  ('Michael Schmidt', 5, 'The hot stone massage was life-changing. Highly recommended!', 'مساج الأحجار الساخنة غير حياتي. أوصي به بشدة!', 'Germany'),
+  ('Nour Hassan', 5, 'Best facial I have ever had. My skin feels amazing!', 'أفضل عناية بشرة حصلت عليها. بشرتي رائعة!', 'Egypt')
+on conflict do nothing;

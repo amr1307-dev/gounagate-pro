@@ -8,7 +8,7 @@ export function cn(...inputs: ClassValue[]) {
 export function generateBookingRef(): string {
   const ts = Date.now().toString(36).toUpperCase()
   const rand = Math.random().toString(36).substring(2, 5).toUpperCase()
-  return `GG-${ts}-${rand}`
+  return `PW-${ts}-${rand}`
 }
 
 export function generateHash(data: Record<string, unknown>): string {

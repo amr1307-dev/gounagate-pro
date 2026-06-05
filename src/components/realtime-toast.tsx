@@ -9,7 +9,7 @@ type Toast = {
   type: 'check-in' | 'new-booking'
 }
 
-export function RealtimeToast({ businessId }: { businessId: string }) {
+export function RealtimeToast() {
   const [toasts, setToasts] = useState<Toast[]>([])
 
   useEffect(() => {
@@ -23,27 +23,25 @@ export function RealtimeToast({ businessId }: { businessId: string }) {
           event: 'UPDATE',
           schema: 'public',
           table: 'bookings',
-          filter: `business_id=eq.${businessId}`,
+          filter: `status=eq.completed`,
         },
         (payload) => {
           const booking = payload.new as any
-          if (booking.status === 'checked-in') {
-            const toast: Toast = {
-              id: crypto.randomUUID(),
-              message: `✅ ${booking.guest_name} checked in!`,
-              type: 'check-in',
-            }
-            setToasts((prev) => [...prev, toast])
-            setTimeout(() => {
-              setToasts((prev) => prev.filter((t) => t.id !== toast.id))
-            }, 4000)
+          const toast: Toast = {
+            id: crypto.randomUUID(),
+            message: `✅ ${booking.guest_name} started their session!`,
+            type: 'check-in',
+          }
+          setToasts((prev) => [...prev, toast])
+          setTimeout(() => {
+            setToasts((prev) => prev.filter((t) => t.id !== toast.id))
+          }, 4000)
 
-            if ('Notification' in window && Notification.permission === 'granted') {
-              new Notification('Guest Checked In', {
-                body: `${booking.guest_name} has entered the gate.`,
-                icon: '/favicon.ico',
-              })
-            }
+          if ('Notification' in window && Notification.permission === 'granted') {
+            new Notification('Session Started', {
+              body: `${booking.guest_name} has started their session.`,
+              icon: '/favicon.ico',
+            })
           }
         }
       )
@@ -56,7 +54,7 @@ export function RealtimeToast({ businessId }: { businessId: string }) {
     return () => {
       supabase.removeChannel(channel)
     }
-  }, [businessId])
+  }, [])
 
   if (toasts.length === 0) return null
 

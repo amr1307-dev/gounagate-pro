@@ -9,16 +9,15 @@ type Booking = {
   guest_name: string
   booking_date: string
   booking_time: string
-  guests: number
+  total_price: number
   status: string
 }
 
 const statusColors: Record<string, string> = {
   confirmed: '#0A6E74',
-  'checked-in': '#10B981',
+  completed: '#10B981',
   cancelled: '#EF4444',
   pending: '#F59E0B',
-  'no-show': '#94A3B8',
 }
 
 export default function CalendarPage() {
@@ -33,7 +32,7 @@ export default function CalendarPage() {
 
     supabase
       .from('bookings')
-      .select('id, booking_ref, guest_name, booking_date, booking_time, guests, status')
+      .select('id, booking_ref, guest_name, booking_date, booking_time, total_price, status')
       .gte('booking_date', startOfMonth)
       .lte('booking_date', endOfMonth)
       .order('booking_date', { ascending: true })
@@ -123,7 +122,7 @@ export default function CalendarPage() {
                     <span className="text-xs font-bold text-slate-400">{b.booking_time}</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-xs text-slate-400">{b.guests} {b.guests === 1 ? 'guest' : 'guests'}</span>
+                    <span className="text-xs font-semibold text-[#D4A843]">{b.total_price.toLocaleString('en-EG')} EGP</span>
                     <span className="text-xs px-2 py-0.5 rounded-full font-medium"
                       style={{
                         backgroundColor: statusColors[b.status] + '20',

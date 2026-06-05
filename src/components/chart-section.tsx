@@ -21,7 +21,7 @@ export function ChartSection({ bookings }: { bookings: Booking[] }) {
     return {
       date: new Date(date + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric' }),
       bookings: dayBookings.length,
-      checkedIn: dayBookings.filter(b => b.status === 'checked-in').length,
+      completed: dayBookings.filter(b => b.status === 'completed').length,
     }
   })
 
@@ -52,7 +52,7 @@ export function ChartSection({ bookings }: { bookings: Booking[] }) {
               }}
             />
             <Bar dataKey="bookings" fill="#0A6E74" radius={[4, 4, 0, 0]} name="Bookings" />
-            <Bar dataKey="checkedIn" fill="#10B981" radius={[4, 4, 0, 0]} name="Checked In" />
+            <Bar dataKey="completed" fill="#10B981" radius={[4, 4, 0, 0]} name="Completed" />
           </BarChart>
         </ResponsiveContainer>
       </div>

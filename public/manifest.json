@@ -1,7 +1,7 @@
 {
-  "name": "GounaGate Pro",
-  "short_name": "GounaGate",
-  "description": "Smart Booking & QR Entry System for El Gouna",
+  "name": "Paradise World Hurghada",
+  "short_name": "Paradise World",
+  "description": "Premium Spa & Wellness in Hurghada - Book your session with instant QR confirmation",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
@@ -26,7 +26,7 @@
       "sizes": "1080x1920",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "GounaGate Scanner"
+      "label": "Paradise World Booking"
     }
   ]
 }
