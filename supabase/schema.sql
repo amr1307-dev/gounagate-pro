@@ -175,7 +175,7 @@ create policy "Admin can read activity logs"
 
 create policy "Admin can insert activity logs"
   on activity_logs for insert
-  using (auth.role() = 'authenticated');
+  with check (auth.role() = 'authenticated');
 
 -- RLS: QR scans
 create policy "Admin can read qr_scans"
@@ -184,7 +184,7 @@ create policy "Admin can read qr_scans"
 
 create policy "Admin can insert qr_scans"
   on qr_scans for insert
-  using (auth.role() = 'authenticated');
+  with check (auth.role() = 'authenticated');
 
 -- Verify booking function
 create or replace function verify_booking(p_booking_id uuid, p_hash text)
