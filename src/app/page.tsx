@@ -93,6 +93,22 @@ function FadeInSection({ children, className, delay = 0 }: { children: React.Rea
   )
 }
 
+const BASE_URL = 'https://andnjljpdfagluqjfroo.supabase.co/storage/v1/object/public/package-images/packages/'
+const HERO_SLIDES = [
+  BASE_URL + 'slide-4.jpg',
+  BASE_URL + 'slide-5.jpg',
+  BASE_URL + 'slide-6.jpg',
+  BASE_URL + 'slide-7.jpg',
+  BASE_URL + 'slide-10.jpg',
+  BASE_URL + 'slide-15.jpg',
+]
+const HERO_PHOTOS = [
+  { src: BASE_URL + 'gallery-spa-5.jpg', size: 160, top: 7, left: 4, delay: 0 },
+  { src: BASE_URL + 'gallery-salt-cave-1.jpg', size: 130, top: 3, left: 78, delay: -2 },
+  { src: BASE_URL + 'gallery-spa-4.jpg', size: 140, top: 56, left: 3, delay: -4 },
+  { src: BASE_URL + 'beauty-center.jpg', size: 120, top: 54, left: 82, delay: -1 },
+]
+
 export default function LandingPage() {
   const [categories, setCategories] = useState<Category[]>([])
   const [testimonials, setTestimonials] = useState<Testimonial[]>([])
@@ -102,6 +118,7 @@ export default function LandingPage() {
   const [selectedService, setSelectedService] = useState<Package | null>(null)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [lang, setLang] = useState<'en' | 'ar'>('en')
+  const [currentSlide, setCurrentSlide] = useState(0)
 
   const servicesRef = useRef<HTMLElement>(null)
 
@@ -124,6 +141,13 @@ export default function LandingPage() {
       setTestimonials(tests || [])
       setAllPackages(pkgs || [])
     }).finally(() => setLoading(false))
+  }, [])
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide(c => (c + 1) % HERO_SLIDES.length)
+    }, 5000)
+    return () => clearInterval(timer)
   }, [])
 
   const openDrawer = useCallback((pkg: Package) => {
@@ -157,15 +181,41 @@ export default function LandingPage() {
     <div className="overflow-x-hidden">
       <ScrollProgress />
       {/* ==================== HERO ==================== */}
-      <section className="relative min-h-[90vh] flex items-center overflow-hidden hero-gradient-paradise">
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="floating-circle w-72 h-72 bg-teal-400/5 rounded-full absolute -top-20 -left-20" />
-          <div className="floating-circle w-56 h-56 bg-amber-400/6 rounded-full absolute top-1/3 -right-16" style={{ animationDelay: '-2s' }} />
-          <div className="floating-circle w-40 h-40 bg-teal-300/5 rounded-full absolute bottom-1/4 left-1/4" style={{ animationDelay: '-4s' }} />
-          <div className="floating-circle w-32 h-32 bg-amber-300/5 rounded-full absolute top-1/2 right-1/3" style={{ animationDelay: '-1s' }} />
+      <section className="relative min-h-[90vh] flex items-center overflow-hidden">
+        {/* Background Image Slideshow */}
+        <div className="hero-slider-bg">
+          {HERO_SLIDES.map((src, i) => (
+            <img
+              key={i}
+              src={src}
+              alt=""
+              className={`hero-slide-img ${currentSlide === i ? 'active' : ''}`}
+            />
+          ))}
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/10 to-white/30 z-[1]" />
         </div>
 
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 w-full pt-24 pb-20 sm:pt-28 sm:pb-28">
+        {/* Floating Photo Gallery */}
+        <div className="floating-photo-gallery">
+          {HERO_PHOTOS.map((photo, i) => (
+            <div
+              key={i}
+              className="hero-photo-card"
+              style={{
+                width: `${photo.size}px`,
+                height: `${photo.size * 0.75}px`,
+                top: `${photo.top}%`,
+                left: `${photo.left}%`,
+                animationDelay: `${photo.delay}s`,
+                zIndex: 0,
+              }}
+            >
+              <img src={photo.src} alt="" />
+            </div>
+          ))}
+        </div>
+
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 w-full pt-24 pb-20 sm:pt-28 sm:pb-28 relative z-10">
           <div className="grid lg:grid-cols-5 gap-10 items-center">
             <div className="lg:col-span-3 text-center lg:text-left animate-in">
               <div className="flex flex-wrap justify-center lg:justify-start gap-2 mb-6">
@@ -180,7 +230,7 @@ export default function LandingPage() {
                   {t('Paradise', 'الجنة')}
                 </span>
               </h1>
-              <p className="mt-4 text-lg sm:text-xl text-slate-500 max-w-xl mx-auto lg:mx-0 leading-relaxed">
+              <p className="mt-4 text-lg sm:text-xl text-slate-600 max-w-xl mx-auto lg:mx-0 leading-relaxed">
                 {t(
                   'Where every tension melts away. Premium spa treatments, salt cave therapy, and massages — book in 30 seconds with instant QR confirmation.',
                   'حيث تذوب كل همومك. علاجات سبا فاخرة، علاج بملح البحر، مساج — احجز في 30 ثانية مع تأكيد فوري بالـ QR.'
@@ -190,28 +240,30 @@ export default function LandingPage() {
               <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 mt-8">
                 <button
                   onClick={scrollToServices}
-                  className="btn-hero-primary text-base sm:text-lg px-10 py-4"
+                  className="btn-hero-primary-gold btn-shimmer text-base sm:text-lg px-10 py-4"
                 >
-                  {t('Book Your Session ↓', 'احجز جلستك ↓')}
+                  <span>✨</span> {t('Book Your Session', 'احجز جلستك')} <span>↓</span>
                 </button>
                 <a
                   href="https://wa.me/201019382288"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="btn-hero-secondary text-base px-10 py-4"
+                  className="btn-hero-secondary-glass text-base px-10 py-4"
                 >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
                   {t('WhatsApp', 'واتساب')}
                 </a>
               </div>
 
               <div className="flex items-center justify-center lg:justify-start gap-3 mt-6">
                 <div className="flex -space-x-2">
-                  {['#0A6E74', '#D4A843', '#065256', '#B8860B'].map((color, i) => (
+                  {[BASE_URL + 'massage-home.png', BASE_URL + 'sauna-home.png', BASE_URL + 'beauty-center.jpg', BASE_URL + 'gallery-spa-4.jpg'].map((src, i) => (
                     <div
                       key={i}
-                      className="size-9 rounded-full border-2 border-white shadow-sm"
-                      style={{ background: `linear-gradient(135deg, ${color}, ${color}dd)` }}
-                    />
+                      className="size-10 rounded-full border-2 border-white shadow-md overflow-hidden"
+                    >
+                      <img src={src} alt="" className="w-full h-full object-cover" />
+                    </div>
                   ))}
                 </div>
                 <div className="text-left">
@@ -222,7 +274,7 @@ export default function LandingPage() {
             </div>
 
             <div className="lg:col-span-2 hidden lg:block animate-in">
-              <div className="card-elevated p-6 rounded-2xl">
+              <div className="card-elevated p-6 rounded-2xl quick-book-card">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-bold text-slate-900 text-sm">{t('Book in 30 Seconds', 'احجز في 30 ثانية')}</h3>
                   <span className="text-[10px] text-emerald-700 bg-emerald-50 px-2 py-1 rounded-full font-medium">✓ {t('Instant', 'فوري')}</span>
@@ -245,7 +297,7 @@ export default function LandingPage() {
                         <button
                           key={s.id}
                           onClick={() => openDrawer(s)}
-                          className="text-xs px-3 py-1.5 rounded-full border border-slate-200 text-slate-600 hover:border-teal-400 hover:bg-teal-50 hover:text-teal-700 transition font-medium"
+                          className="text-xs px-3 py-1.5 rounded-full border border-slate-200 text-slate-600 hover:border-amber-400 hover:bg-amber-50 hover:text-amber-700 transition font-medium"
                         >
                           {s.name_en} — {s.price.toLocaleString('en-EG')} EGP
                         </button>
@@ -254,9 +306,9 @@ export default function LandingPage() {
                   </div>
                   <button
                     onClick={scrollToServices}
-                    className="w-full mt-3 bg-gradient-to-r from-[#D4A843] to-[#B8860B] text-white font-bold py-3 rounded-xl text-sm hover:shadow-lg hover:shadow-amber-900/20 transition-all active:scale-[0.98]"
+                    className="w-full mt-3 bg-gradient-to-r from-[#D4A843] to-[#B8860B] text-white font-bold py-3.5 rounded-xl text-sm hover:shadow-lg hover:shadow-amber-900/25 transition-all active:scale-[0.97] btn-shimmer"
                   >
-                    {t('Book Now', 'احجز الآن')}
+                    ✨ {t('Book Now', 'احجز الآن')}
                   </button>
                   <p className="text-[10px] text-slate-400 text-center mt-1">
                     {t('Free cancellation · Instant QR code', 'إلغاء مجاني · QR فوري')}
@@ -353,13 +405,13 @@ export default function LandingPage() {
                       <div className="flex gap-1.5">
                         <button
                           onClick={() => openDrawer(pkg)}
-                          className="text-xs font-semibold text-teal-700 bg-teal-50 px-3 py-1.5 rounded-lg hover:bg-teal-100 transition"
+                          className="btn-details"
                         >
                           {t('Details', 'التفاصيل')}
                         </button>
                         <Link
                           href={`/book/${pkg.id}`}
-                          className="text-xs font-bold text-white bg-gradient-to-r from-[#0A6E74] to-[#065256] px-3 py-1.5 rounded-lg hover:shadow-md transition"
+                          className="btn-book-gold"
                         >
                           {t('Book', 'احجز')}
                         </Link>
@@ -450,10 +502,10 @@ export default function LandingPage() {
               </div>
             </FadeInSection>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {testimonials.slice(0, 6).map((tItem, i) => (
-                <FadeInSection key={tItem.id} delay={i * 80}>
-                  <div className="testimonial-card">
+            <div className="testimonials-marquee">
+              <div className="testimonials-track">
+                {[...testimonials, ...testimonials].map((tItem, i) => (
+                  <div key={`${tItem.id}-${i}`} className="testimonial-card min-w-[320px] max-w-[360px] shrink-0">
                     <div className="flex gap-1 mb-2">
                       {Array.from({ length: tItem.rating }).map((_, ri) => (
                         <span key={ri} className="text-amber-500 text-sm">★</span>
@@ -463,7 +515,7 @@ export default function LandingPage() {
                       &ldquo;{tItem.comment_en}&rdquo;
                     </p>
                     <div className="flex items-center gap-2 mt-auto">
-                      <div className="size-8 rounded-full bg-gradient-to-br from-teal-600 to-teal-800 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                      <div className="size-9 rounded-full bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center text-white text-xs font-bold shrink-0">
                         {tItem.client_name.charAt(0)}
                       </div>
                       <div>
@@ -474,8 +526,8 @@ export default function LandingPage() {
                       </div>
                     </div>
                   </div>
-                </FadeInSection>
-              ))}
+                ))}
+              </div>
             </div>
 
             <FadeInSection delay={200}>
@@ -568,7 +620,7 @@ export default function LandingPage() {
                         href={`https://www.google.com/maps/search/${encodeURIComponent(branch.addr)}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex-1 text-center text-sm font-semibold text-white bg-gradient-to-r from-[#0A6E74] to-[#065256] py-2.5 rounded-xl hover:shadow-md transition active:scale-[0.98]"
+                        className="btn-direction flex-1"
                       >
                         📍 {t('Get Directions', 'اتجاهات')}
                       </a>
@@ -576,7 +628,7 @@ export default function LandingPage() {
                         href="https://wa.me/201019382288"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="size-11 flex items-center justify-center rounded-xl border-2 border-[#25D366] text-[#25D366] hover:bg-[#25D366] hover:text-white transition"
+                        className="btn-whatsapp"
                       >
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
                       </a>
@@ -592,7 +644,7 @@ export default function LandingPage() {
       {/* ==================== CTA ==================== */}
       <section className="mx-auto max-w-6xl px-4 sm:px-6 pb-20">
         <FadeInSection>
-          <div className="cta-box">
+          <div className="cta-box-enhanced">
             <div className="floating-circle absolute w-48 h-48 bg-white/5 rounded-full -top-16 -right-16" style={{ animationDelay: '-1s' }} />
             <div className="floating-circle absolute w-32 h-32 bg-amber-300/5 rounded-full -bottom-10 -left-10" style={{ animationDelay: '-3s' }} />
             <div className="relative z-10">
@@ -604,9 +656,9 @@ export default function LandingPage() {
               </p>
               <button
                 onClick={scrollToServices}
-                className="cta-button"
+                className="cta-button btn-shimmer"
               >
-                {t('Book Your Session', 'احجز جلستك')} →
+                ✨ {t('Book Your Session', 'احجز جلستك')} →
               </button>
               <div className="flex flex-wrap justify-center gap-4 mt-6 text-sm text-white/70">
                 <span className="flex items-center gap-1.5">✓ {t('Free cancellation', 'إلغاء مجاني')}</span>

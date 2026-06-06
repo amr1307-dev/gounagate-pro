@@ -584,3 +584,294 @@ html[dir="rtl"] .cta-button {
 html[dir="rtl"] .step-card {
   text-align: center;
 }
+
+/* ==================== ENHANCED STYLES ==================== */
+
+/* Hero Slider Background */
+.hero-slider-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.hero-slider-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(240,253,249,0.92) 0%, rgba(240,253,249,0.80) 40%, rgba(240,253,249,0.70) 100%);
+  z-index: 1;
+}
+.hero-slide-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.hero-slide-img.active {
+  opacity: 1;
+}
+
+/* Hero Floating Photo Cards */
+.hero-photo-card {
+  position: absolute;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+  animation: float-around 8s ease-in-out infinite;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+.hero-photo-card:hover {
+  transform: scale(1.08) !important;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  z-index: 10;
+}
+.hero-photo-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Button Shimmer Effect */
+.btn-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.btn-shimmer::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  animation: shimmer 2.5s ease-in-out infinite;
+}
+@keyframes shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* Button Glow Pulse */
+.btn-glow {
+  animation: btn-glow-pulse 2.5s ease-in-out infinite;
+}
+@keyframes btn-glow-pulse {
+  0%, 100% { box-shadow: 0 4px 20px rgba(10, 110, 116, 0.3); }
+  50% { box-shadow: 0 4px 30px rgba(10, 110, 116, 0.5), 0 0 40px rgba(10, 110, 116, 0.15); }
+}
+
+.btn-hero-primary-gold {
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  color: white;
+  border-radius: 14px;
+  font-weight: 800;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: 0 4px 20px rgba(184, 134, 11, 0.35);
+  position: relative;
+  overflow: hidden;
+}
+.btn-hero-primary-gold::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  animation: shimmer 2.5s ease-in-out infinite;
+}
+.btn-hero-primary-gold:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 35px rgba(184, 134, 11, 0.45);
+}
+.btn-hero-primary-gold:active {
+  transform: translateY(0) scale(0.97);
+}
+
+.btn-hero-secondary-glass {
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: var(--primary-dark);
+  border: 2px solid rgba(10, 110, 116, 0.3);
+  border-radius: 14px;
+  font-weight: 700;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.btn-hero-secondary-glass:hover {
+  background: rgba(10, 110, 116, 0.1);
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(10, 110, 116, 0.15);
+}
+.btn-hero-secondary-glass:active {
+  transform: translateY(0) scale(0.97);
+}
+
+/* Service Card Book Button - Gold with shine */
+.btn-book-gold {
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  color: white;
+  font-weight: 700;
+  border: none;
+  border-radius: 10px;
+  padding: 8px 18px;
+  font-size: 13px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.btn-book-gold::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+  animation: shimmer 3s ease-in-out infinite;
+}
+.btn-book-gold:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(184, 134, 11, 0.35);
+}
+
+/* Service Card Details Button - Enhanced */
+.btn-details {
+  background: rgba(10, 110, 116, 0.08);
+  color: var(--primary);
+  font-weight: 600;
+  border: 1px solid rgba(10, 110, 116, 0.15);
+  border-radius: 10px;
+  padding: 8px 18px;
+  font-size: 13px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+.btn-details:hover {
+  background: var(--primary);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(10, 110, 116, 0.25);
+}
+
+/* Testimonial Auto-Scroll Section */
+.testimonials-marquee {
+  overflow: hidden;
+  position: relative;
+}
+.testimonials-marquee::before,
+.testimonials-marquee::after {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 60px;
+  z-index: 2;
+  pointer-events: none;
+}
+.testimonials-marquee::before {
+  left: 0;
+  background: linear-gradient(90deg, var(--background), transparent);
+}
+.testimonials-marquee::after {
+  right: 0;
+  background: linear-gradient(-90deg, var(--background), transparent);
+}
+.testimonials-track {
+  display: flex;
+  gap: 20px;
+  width: max-content;
+  animation: marquee-scroll 35s linear infinite;
+}
+.testimonials-track:hover {
+  animation-play-state: paused;
+}
+@keyframes marquee-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* Floating hero image gallery cards */
+.floating-photo-gallery {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Quick booking card enhancements */
+.quick-book-card {
+  animation: float-gentle 6s ease-in-out infinite;
+}
+@keyframes float-gentle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+/* Branch buttons enhanced */
+.btn-direction {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: white;
+  font-weight: 700;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 20px;
+  font-size: 14px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.btn-direction:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(10, 110, 116, 0.3);
+}
+
+/* WhatsApp button enhanced */
+.btn-whatsapp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: 2px solid #25D366;
+  color: #25D366;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  background: transparent;
+}
+.btn-whatsapp:hover {
+  background: #25D366;
+  color: white;
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 4px 16px rgba(37, 211, 102, 0.3);
+}
+
+/* CTA section enhanced */
+.cta-box-enhanced {
+  background: linear-gradient(135deg, var(--primary), #0D4F53);
+  border-radius: 24px;
+  padding: 4rem 2rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.cta-box-enhanced::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 30% 20%, rgba(212,168,67,0.1) 0%, transparent 60%),
+              radial-gradient(ellipse at 70% 80%, rgba(15,163,177,0.08) 0%, transparent 50%);
+}
