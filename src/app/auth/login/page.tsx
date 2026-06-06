@@ -75,10 +75,17 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <div className="mt-6 pt-6 border-t border-slate-100 text-center">
-          <a href="/" className="text-sm text-slate-400 hover:text-slate-600">
-            ← Back to home
-          </a>
+        <div className="mt-6 pt-6 border-t border-slate-100 text-center space-y-2">
+          <div>
+            <a href="/auth/signup" className="text-sm text-teal-700 hover:text-teal-800 font-medium">
+              Create new account →
+            </a>
+          </div>
+          <div>
+            <a href="/" className="text-sm text-slate-400 hover:text-slate-600">
+              ← Back to home
+            </a>
+          </div>
         </div>
       </div>
     </div>

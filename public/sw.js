@@ -1,30 +1,20 @@
-const CACHE = 'paradise-world-v1'
-const CACHEABLE = [
-  '/',
-  '/auth/login',
-  '/auth/signup',
+const CACHE = 'paradise-world-v2'
+const ASSETS = [
   '/manifest.json',
-  '/favicon.ico',
 ]
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE).then((cache) => {
-      return cache.addAll(CACHEABLE)
-    })
+    caches.open(CACHE).then((cache) => cache.addAll(ASSETS))
   )
-  self.skipWaiting()
 })
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
-      Promise.all(
-        keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))
-      )
+      Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)))
     )
   )
-  self.clients.claim()
 })
 
 self.addEventListener('fetch', (event) => {
@@ -38,7 +28,12 @@ self.addEventListener('fetch', (event) => {
     return
   }
 
-  event.respondWith(cacheFirst(request))
+  if (url.pathname.match(/\.(js|css|png|jpg|jpeg|gif|svg|ico|webp|woff2?)$/)) {
+    event.respondWith(cacheFirst(request))
+    return
+  }
+
+  event.respondWith(networkFirst(request))
 })
 
 async function cacheFirst(request) {

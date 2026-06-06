@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { getEgyptPhone, generateTimeBasedHash } from '@/lib/utils'
 
-type BookingData = {
+export type BookingData = {
   id: string
   booking_ref: string
   guest_name: string
@@ -31,7 +31,7 @@ export function QRDisplay({
 }) {
   const qrRef = useRef<HTMLDivElement>(null)
   const qrInstance = useRef<any>(null)
-  const [expiresAt, setExpiresAt] = useState(Date.now() + 30000)
+  const expiresAtRef = useRef(Date.now() + 30000)
   const [ttl, setTtl] = useState(30)
 
   const generateQR = (expiry: number) => {
@@ -44,13 +44,9 @@ export function QRDisplay({
     const qrData = JSON.stringify({
       id: booking.id,
       ref: booking.booking_ref,
-      name: booking.guest_name,
-      phone: booking.guest_phone,
-      date: booking.booking_date,
-      time: booking.booking_time,
       hash: booking.hash,
-      dynamicHash,
-      expiresAt: expiry,
+      dyn: dynamicHash,
+      exp: expiry,
     })
 
     qrInstance.current = new QRCode(qrRef.current, {
@@ -59,22 +55,23 @@ export function QRDisplay({
       height: 220,
       colorDark: '#000000',
       colorLight: '#ffffff',
-      correctLevel: QRCode.CorrectLevel.H,
+      correctLevel: QRCode.CorrectLevel.L,
     })
   }
 
   useEffect(() => {
     const expiry = Date.now() + 30000
-    setExpiresAt(expiry)
+    expiresAtRef.current = expiry
     generateQR(expiry)
+    setTtl(30)
 
     const ttlInterval = setInterval(() => {
-      setTtl(Math.max(0, Math.ceil((expiresAt - Date.now()) / 1000)))
+      setTtl(Math.max(0, Math.ceil((expiresAtRef.current - Date.now()) / 1000)))
     }, 1000)
 
     const qrInterval = setInterval(() => {
       const nextExpiry = Date.now() + 30000
-      setExpiresAt(nextExpiry)
+      expiresAtRef.current = nextExpiry
       setTtl(30)
       generateQR(nextExpiry)
     }, 30000)

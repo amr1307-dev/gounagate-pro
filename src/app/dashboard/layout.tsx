@@ -13,7 +13,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         <div className="flex items-center gap-2 mb-8 mt-2">
           <svg viewBox="0 0 32 32" fill="none" className="size-7">
             <rect width="32" height="32" rx="8" fill="#B8860B"/>
-            <path d="M16 6C12 6 8 10 8 16C8 22 12 26 16 26C20 26 24 22 24 16' stroke='white' strokeWidth='3' strokeLinecap='round' fill='none"/>
+            <path d="M16 6C12 6 8 10 8 16C8 22 12 26 16 26C20 26 24 22 24 16" stroke="white" strokeWidth="3" strokeLinecap="round" fill="none"/>
             <circle cx="16" cy="16" r="4" fill="white"/>
           </svg>
           <span className="font-bold text-white text-lg">Paradise World</span>

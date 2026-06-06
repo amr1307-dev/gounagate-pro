@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { createClient } from '@/lib/supabase'
 import { generateBookingRef, generateHash, getTodayStr } from '@/lib/utils'
 import { QRDisplay } from './qr-display'
 
@@ -100,30 +99,34 @@ export function BookingForm({ pkg, branches }: { pkg: Package; branches: Branch[
         created_at: new Date().toISOString(),
       }
 
-      const supabase = createClient()
-      const { error } = await supabase.from('bookings').insert({
-        id: newBooking.id,
-        booking_ref: newBooking.booking_ref,
-        package_id: pkg.id,
-        branch_id: data.branch_id,
-        guest_name: newBooking.guest_name,
-        guest_phone: newBooking.guest_phone,
-        guest_email: newBooking.guest_email,
-        booking_date: newBooking.booking_date,
-        booking_time: newBooking.booking_time,
-        total_price: pkg.price,
-        special_requests: newBooking.special_requests,
-        hash: newBooking.hash,
-        status: newBooking.status,
+      const res = await fetch('/api/public/book', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: newBooking.id,
+          booking_ref: newBooking.booking_ref,
+          package_id: pkg.id,
+          branch_id: data.branch_id,
+          guest_name: newBooking.guest_name,
+          guest_phone: newBooking.guest_phone,
+          guest_email: newBooking.guest_email || null,
+          booking_date: newBooking.booking_date,
+          booking_time: newBooking.booking_time,
+          total_price: pkg.price,
+          special_requests: newBooking.special_requests || null,
+          hash: newBooking.hash,
+          status: newBooking.status,
+        }),
       })
 
-      if (error) throw error
+      const json = await res.json()
+      if (!res.ok || json.error) throw new Error(json.error || 'Booking failed')
 
       setBooking(newBooking)
       setStep('result')
     } catch (err) {
       console.error('Booking error:', err)
-      setErrors({ submit: 'Failed to create booking. Please try again.' })
+      setErrors({ submit: err instanceof Error ? err.message : 'Failed to create booking.' })
     } finally {
       setLoading(false)
     }

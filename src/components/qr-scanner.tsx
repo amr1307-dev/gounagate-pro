@@ -103,7 +103,7 @@ export function QRScanner({ userId }: { userId?: string }) {
     try {
       const parsed = JSON.parse(data)
 
-      if (parsed.expiresAt && Date.now() > parsed.expiresAt) {
+      if ((parsed.exp || parsed.expiresAt) && Date.now() > (parsed.exp || parsed.expiresAt)) {
         playErrorSound()
         setResult({ valid: false, message: 'QR code has expired - please ask the guest to refresh their QR' })
         return
@@ -139,7 +139,7 @@ export function QRScanner({ userId }: { userId?: string }) {
       const resp = await fetch('/api/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ bookingId: parsed.id, hash: parsed.hash, dynamicHash: parsed.dynamicHash }),
+        body: JSON.stringify({ bookingId: parsed.id, hash: parsed.hash, dynamicHash: parsed.dyn || parsed.dynamicHash }),
       })
 
       const verifyResult = await resp.json()
