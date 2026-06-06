@@ -4,7 +4,6 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import { ServiceDrawer } from '@/components/service-drawer'
-import { getServiceStyle } from '@/lib/service-placeholders'
 
 type Package = {
   id: string
@@ -336,18 +335,11 @@ export default function LandingPage() {
               <FadeInSection key={pkg.id} delay={i * 80}>
                 <div className="service-card">
                   <div className="relative h-44 overflow-hidden">
-                    {pkg.image_url ? (
-                      <img src={pkg.image_url} alt={pkg.name_en} className="w-full h-full object-cover service-card-img" />
-                    ) : (
-                      (() => {
-                        const ph = getServiceStyle(pkg.name_en)
-                        return (
-                          <div className={`${ph.container} w-full h-full flex items-center justify-center relative overflow-hidden`}>
-                            <span className="text-4xl select-none relative z-10">{ph.icon}</span>
-                          </div>
-                        )
-                      })()
-                    )}
+                    <img
+                      src={pkg.image_url || `/api/placeholder?name=${encodeURIComponent(pkg.name_en)}`}
+                      alt={pkg.name_en}
+                      className="w-full h-full object-cover service-card-img"
+                    />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-full text-xs font-bold text-slate-800 shadow-sm">
                       {pkg.duration_minutes} min

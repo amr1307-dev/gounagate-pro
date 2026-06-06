@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
-import { getServiceStyle } from '@/lib/service-placeholders'
 
 type Package = {
   id: string
@@ -190,22 +189,11 @@ export function ServiceDrawer({ service, open, onClose, testimonials }: ServiceD
 
           <div className="px-4 pb-6">
             <div className="relative h-52 sm:h-64 rounded-2xl overflow-hidden mb-4 -mx-0">
-              {service.image_url ? (
-                <img
-                  src={service.image_url}
-                  alt={service.name_en}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                (() => {
-                  const ph = getServiceStyle(service.name_en)
-                  return (
-                    <div className={`${ph.container} w-full h-full flex items-center justify-center relative overflow-hidden`}>
-                      <span className="text-5xl select-none relative z-10">{ph.icon}</span>
-                    </div>
-                  )
-                })()
-              )}
+              <img
+                src={service.image_url || `/api/placeholder?name=${encodeURIComponent(service.name_en)}`}
+                alt={service.name_en}
+                className="w-full h-full object-cover"
+              />
               <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
               <div className="absolute bottom-3 left-4 right-4">
                 <h3 className="text-xl font-bold text-white drop-shadow-sm">{service.name_en}</h3>
