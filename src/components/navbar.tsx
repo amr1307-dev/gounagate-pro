@@ -32,46 +32,57 @@ export function Navbar() {
 
   return (
     <nav className={cn(
-      'sticky top-0 z-50 h-16 border-b transition-all duration-300',
+      'sticky top-0 z-50 h-16 transition-all duration-500',
       isDashboard
-        ? 'bg-slate-900/95 border-slate-800 text-white'
+        ? 'bg-slate-900 border-b border-slate-800 text-white'
         : scrolled
-          ? 'navbar-scrolled text-slate-900'
-          : 'bg-transparent border-transparent text-slate-900'
+          ? 'bg-white/80 backdrop-blur-xl border-b border-white/20 shadow-lg shadow-black/5 text-slate-900'
+          : 'bg-transparent border-b border-transparent text-white'
     )}>
       <div className="mx-auto flex h-full max-w-7xl items-center justify-between px-4 sm:px-6">
-        <Link href={isDashboard ? '/dashboard' : '/'} className="flex items-center gap-2 font-bold text-lg">
-          <svg viewBox="0 0 32 32" fill="none" className="size-7 shrink-0">
+        <Link href={isDashboard ? '/dashboard' : '/'} className="flex items-center gap-2 font-bold text-lg shrink-0">
+          <svg viewBox="0 0 32 32" fill="none" className="size-7 shrink-0 drop-shadow-sm">
             <rect width="32" height="32" rx="8" fill="#B8860B"/>
             <path d="M16 6C12 6 8 10 8 16C8 22 12 26 16 26C20 26 24 22 24 16" stroke="white" strokeWidth="3" strokeLinecap="round" fill="none"/>
             <circle cx="16" cy="16" r="4" fill="white"/>
           </svg>
-          <span className={cn('hidden sm:inline', !scrolled && !isDashboard && 'opacity-90')}>
+          <span className={cn('hidden sm:inline font-semibold tracking-tight')}>
             Paradise World
           </span>
         </Link>
 
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-2 sm:gap-3">
           {isPublic && (
             <>
               <Link
-                href="/scan/paradise-world"
+                href="/about"
                 className={cn(
-                  'px-3 py-2 rounded-lg text-xs font-semibold transition hidden sm:inline-block',
+                  'px-3.5 py-2 rounded-lg text-sm font-medium transition-all duration-200',
                   scrolled
-                    ? 'text-teal-700 hover:bg-teal-50'
-                    : 'text-white/90 hover:text-white hover:bg-white/10'
+                    ? 'text-slate-700 hover:text-teal-700 hover:bg-teal-50'
+                    : 'text-white/90 hover:text-white hover:bg-white/15'
                 )}
               >
-                {lang === 'en' ? 'Scan QR' : 'مسح QR'}
+                {lang === 'en' ? 'About' : 'من نحن'}
+              </Link>
+              <Link
+                href="#branches"
+                className={cn(
+                  'px-3.5 py-2 rounded-lg text-sm font-medium transition-all duration-200',
+                  scrolled
+                    ? 'text-slate-700 hover:text-teal-700 hover:bg-teal-50'
+                    : 'text-white/90 hover:text-white hover:bg-white/15'
+                )}
+              >
+                {lang === 'en' ? 'Branches' : 'الفروع'}
               </Link>
               <Link
                 href="/auth/login"
                 className={cn(
-                  'px-4 py-2 rounded-lg text-sm font-medium transition',
+                  'px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200',
                   scrolled
-                    ? 'bg-[#0A6E74] text-white hover:bg-[#065256]'
-                    : 'bg-white/15 text-white hover:bg-white/25 backdrop-blur-sm'
+                    ? 'bg-gradient-to-r from-[#0A6E74] to-[#065256] text-white hover:shadow-lg hover:shadow-teal-900/20 hover:-translate-y-0.5 active:scale-[0.97]'
+                    : 'bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 border border-white/20'
                 )}
               >
                 {lang === 'en' ? 'Admin' : 'المشرف'}
@@ -94,27 +105,27 @@ export function Navbar() {
           <button
             onClick={toggleLang}
             className={cn(
-              'size-10 flex items-center justify-center rounded-lg transition',
+              'size-10 flex items-center justify-center rounded-lg transition-all duration-200',
               isDashboard
                 ? 'hover:bg-slate-800'
                 : scrolled
                   ? 'hover:bg-slate-100'
-                  : 'hover:bg-white/10'
+                  : 'hover:bg-white/15'
             )}
             aria-label="Toggle language"
           >
-            <span className={cn('text-sm', isDashboard || scrolled ? '' : 'brightness-0 invert')}>🌐</span>
+            <span className={cn('text-sm leading-none', !scrolled && !isDashboard && 'brightness-0 invert')}>🌐</span>
           </button>
 
           <button
             onClick={() => setMenuOpen(!menuOpen)}
             className={cn(
-              'sm:hidden size-10 flex items-center justify-center rounded-lg transition',
+              'sm:hidden size-10 flex items-center justify-center rounded-lg transition-all duration-200',
               isDashboard
                 ? 'hover:bg-slate-800'
                 : scrolled
                   ? 'hover:bg-slate-100'
-                  : 'hover:bg-white/10'
+                  : 'hover:bg-white/15'
             )}
             aria-label="Menu"
           >
@@ -143,20 +154,31 @@ export function Navbar() {
       )}>
         <div className={cn(
           'px-4 py-3 space-y-2 border-t',
-          isDashboard ? 'bg-slate-900 border-slate-800' : scrolled ? 'bg-white border-slate-200' : 'bg-white/95 backdrop-blur-md border-slate-200'
+          isDashboard
+            ? 'bg-slate-900 border-slate-800'
+            : scrolled
+              ? 'bg-white/95 backdrop-blur-xl border-slate-200'
+              : 'bg-white/95 backdrop-blur-xl border-slate-200'
         )}>
           <Link
-            href="/scan/paradise-world"
-            className="block px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50"
+            href="/about"
+            className="block px-3 py-2.5 rounded-lg text-sm font-medium text-slate-700 hover:bg-teal-50 hover:text-teal-700 transition"
             onClick={() => setMenuOpen(false)}
           >
-            {lang === 'en' ? 'Scan QR' : 'مسح QR'}
+            {lang === 'en' ? 'About Us' : 'من نحن'}
+          </Link>
+          <Link
+            href="#branches"
+            className="block px-3 py-2.5 rounded-lg text-sm font-medium text-slate-700 hover:bg-teal-50 hover:text-teal-700 transition"
+            onClick={() => setMenuOpen(false)}
+          >
+            {lang === 'en' ? 'Branches' : 'الفروع'}
           </Link>
           <a
             href="https://wa.me/201019382288"
             target="_blank"
             rel="noopener noreferrer"
-            className="block px-3 py-2 rounded-lg text-sm font-medium text-emerald-700 hover:bg-emerald-50"
+            className="block px-3 py-2.5 rounded-lg text-sm font-medium text-emerald-700 hover:bg-emerald-50 transition"
             onClick={() => setMenuOpen(false)}
           >
             {lang === 'en' ? 'WhatsApp' : 'واتساب'}

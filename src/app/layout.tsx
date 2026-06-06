@@ -27,6 +27,8 @@ export default function RootLayout({
   return (
     <html lang="en" dir="ltr" className={`${inter.variable} ${cairo.variable}`}>
       <head>
+        <link rel="preconnect" href="https://andnjljpdfagluqjfroo.supabase.co" />
+        <link rel="dns-prefetch" href="https://andnjljpdfagluqjfroo.supabase.co" />
         <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23B8860B'/><path d='M16 6C12 6 8 10 8 16C8 22 12 26 16 26C20 26 24 22 24 16' stroke='white' stroke-width='3' stroke-linecap='round' fill='none'/><circle cx='16' cy='16' r='4' fill='white'/></svg>" />
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#0A6E74" />

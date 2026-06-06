@@ -17,6 +17,7 @@ export function Footer() {
         </p>
         <div className="flex items-center justify-center gap-4 mt-2 text-xs text-slate-400">
           <Link href="/" className="hover:text-slate-600 transition">Home</Link>
+          <Link href="/about" className="hover:text-slate-600 transition">About</Link>
           <a href="https://wa.me/201019382288" target="_blank" rel="noopener noreferrer" className="hover:text-slate-600 transition">WhatsApp</a>
           <Link href="/auth/login" className="hover:text-slate-600 transition">Admin</Link>
         </div>
