@@ -37,7 +37,11 @@ export function LangProvider({ children }: { children: ReactNode }) {
     setLangState(newLang)
     document.documentElement.dir = newLang === 'ar' ? 'rtl' : 'ltr'
     document.documentElement.lang = newLang
-    try { localStorage.setItem('site_lang', newLang) } catch {}
+    try {
+      localStorage.setItem('site_lang', newLang)
+    } catch (e) {
+      console.warn('LangContext: localStorage.setItem failed', e)
+    }
   }
 
   const t = (en: string, ar: string) => lang === 'ar' ? ar : en

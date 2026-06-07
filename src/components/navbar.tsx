@@ -5,10 +5,10 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import { cn } from '@/lib/utils'
-import { useLang } from '@/lib/lang-context'
+import { getLang, setLang, subscribe } from '@/lib/lang-store'
 
 export function Navbar() {
-  const { lang, setLang } = useLang()
+  const [lang, setLangState] = useState<'en' | 'ar'>(getLang())
   const [menuOpen, setMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const pathname = usePathname()
@@ -20,6 +20,8 @@ export function Navbar() {
     handleScroll()
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  useEffect(() => subscribe(setLangState), [])
 
   const toggleLang = () => {
     setLang(lang === 'en' ? 'ar' : 'en')
