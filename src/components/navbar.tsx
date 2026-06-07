@@ -25,7 +25,10 @@ export function Navbar() {
     setLang(newLang)
     document.documentElement.dir = newLang === 'ar' ? 'rtl' : 'ltr'
     document.documentElement.lang = newLang
-    try { localStorage.setItem('site_lang', newLang) } catch {}
+    try {
+      localStorage.setItem('site_lang', newLang)
+      window.dispatchEvent(new Event('langchange'))
+    } catch {}
   }
 
   useEffect(() => {
@@ -35,6 +38,7 @@ export function Navbar() {
         setLang(stored)
         document.documentElement.dir = stored === 'ar' ? 'rtl' : 'ltr'
         document.documentElement.lang = stored
+        window.dispatchEvent(new Event('langchange'))
       }
     } catch {}
   }, [])

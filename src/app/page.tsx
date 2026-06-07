@@ -138,12 +138,12 @@ export default function LandingPage() {
         document.documentElement.lang = 'ar'
       }
     }
-    const observer = new MutationObserver(() => {
-      const htmlLang = document.documentElement.lang
-      if (htmlLang === 'ar' || htmlLang === 'en') setLang(htmlLang)
-    })
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] })
-    return () => observer.disconnect()
+    const handler = () => {
+      const stored = (() => { try { return localStorage.getItem('site_lang') } catch { return null } })()
+      if (stored === 'ar' || stored === 'en') setLang(stored)
+    }
+    window.addEventListener('langchange', handler)
+    return () => window.removeEventListener('langchange', handler)
   }, [])
 
   useEffect(() => {
