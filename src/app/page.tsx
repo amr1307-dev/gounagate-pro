@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
-import { getLang, subscribe } from '@/lib/lang-store'
 import { ServiceDrawer } from '@/components/service-drawer'
 
 type Package = {
@@ -118,10 +117,17 @@ export default function LandingPage() {
   const [allPackages, setAllPackages] = useState<Package[]>([])
   const [loading, setLoading] = useState(true)
   const [activeCategory, setActiveCategory] = useState<string>('all')
-  const [lang, setLang] = useState<'en' | 'ar'>(getLang())
+  const [lang, setLang] = useState<'en' | 'ar'>('en')
   const [selectedService, setSelectedService] = useState<Package | null>(null)
 
-  useEffect(() => subscribe(setLang), [])
+  useEffect(() => {
+    const id = setInterval(() => {
+      const d = document.documentElement.lang
+      if (d === 'ar') setLang('ar')
+      else if (d === 'en') setLang('en')
+    }, 50)
+    return () => clearInterval(id)
+  }, [])
 
   const t = (en: string, ar: string) => lang === 'ar' ? ar : en
   const [drawerOpen, setDrawerOpen] = useState(false)

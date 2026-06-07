@@ -5,10 +5,9 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import { cn } from '@/lib/utils'
-import { getLang, setLang, subscribe } from '@/lib/lang-store'
 
 export function Navbar() {
-  const [lang, setLangState] = useState<'en' | 'ar'>(getLang())
+  const [lang, setLang] = useState<'en' | 'ar'>('en')
   const [menuOpen, setMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const pathname = usePathname()
@@ -21,10 +20,17 @@ export function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  useEffect(() => subscribe(setLangState), [])
+  useEffect(() => {
+    const stored = (() => { try { return localStorage.getItem('site_lang') } catch { return null } })()
+    if (stored === 'ar') { setLang('ar'); document.documentElement.lang = 'ar'; document.documentElement.dir = 'rtl' }
+  }, [])
 
   const toggleLang = () => {
-    setLang(lang === 'en' ? 'ar' : 'en')
+    const newLang = lang === 'en' ? 'ar' : 'en'
+    document.documentElement.dir = newLang === 'ar' ? 'rtl' : 'ltr'
+    document.documentElement.lang = newLang
+    try { localStorage.setItem('site_lang', newLang) } catch {}
+    setLang(newLang)
   }
 
   const isDashboard = pathname.startsWith('/dashboard')
