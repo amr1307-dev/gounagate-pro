@@ -25,7 +25,19 @@ export function Navbar() {
     setLang(newLang)
     document.documentElement.dir = newLang === 'ar' ? 'rtl' : 'ltr'
     document.documentElement.lang = newLang
+    try { localStorage.setItem('site_lang', newLang) } catch {}
   }
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('site_lang') as 'en' | 'ar' | null
+      if (stored === 'ar' || stored === 'en') {
+        setLang(stored)
+        document.documentElement.dir = stored === 'ar' ? 'rtl' : 'ltr'
+        document.documentElement.lang = stored
+      }
+    } catch {}
+  }, [])
 
   const isDashboard = pathname.startsWith('/dashboard')
   const isPublic = !isDashboard

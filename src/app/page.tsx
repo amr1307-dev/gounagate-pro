@@ -125,12 +125,25 @@ export default function LandingPage() {
   const servicesRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
-    const userLang = navigator.language || navigator.languages?.[0] || 'en'
-    if (userLang.startsWith('ar')) {
-      setLang('ar')
-      document.documentElement.dir = 'rtl'
-      document.documentElement.lang = 'ar'
+    const stored = (() => { try { return localStorage.getItem('site_lang') } catch { return null } })()
+    if (stored === 'ar' || stored === 'en') {
+      setLang(stored)
+      document.documentElement.dir = stored === 'ar' ? 'rtl' : 'ltr'
+      document.documentElement.lang = stored
+    } else {
+      const userLang = navigator.language || navigator.languages?.[0] || 'en'
+      if (userLang.startsWith('ar')) {
+        setLang('ar')
+        document.documentElement.dir = 'rtl'
+        document.documentElement.lang = 'ar'
+      }
     }
+    const observer = new MutationObserver(() => {
+      const htmlLang = document.documentElement.lang
+      if (htmlLang === 'ar' || htmlLang === 'en') setLang(htmlLang)
+    })
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] })
+    return () => observer.disconnect()
   }, [])
 
   useEffect(() => {
@@ -407,8 +420,8 @@ export default function LandingPage() {
                     </div>
                   </div>
                   <div className="p-4">
-                    <h3 className="font-bold text-slate-900">{pkg.name_en}</h3>
-                    <p className="text-xs text-slate-400 mt-0.5 line-clamp-2">{pkg.description_en}</p>
+                    <h3 className="font-bold text-slate-900">{lang === 'ar' && pkg.name_ar ? pkg.name_ar : pkg.name_en}</h3>
+                    <p className="text-xs text-slate-400 mt-0.5 line-clamp-2">{lang === 'ar' && pkg.description_ar ? pkg.description_ar : pkg.description_en}</p>
                     <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-100">
                       <div>
                         {pkg.discount_percent && pkg.discount_percent > 0 ? (
@@ -535,7 +548,7 @@ export default function LandingPage() {
                       ))}
                     </div>
                     <p className="text-sm text-slate-600 mb-3 leading-relaxed italic">
-                      &ldquo;{tItem.comment_en}&rdquo;
+                      &ldquo;{lang === 'ar' && tItem.comment_ar ? tItem.comment_ar : tItem.comment_en}&rdquo;
                     </p>
                     <div className="flex items-center gap-2 mt-auto">
                       <div className="size-9 rounded-full bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center text-white text-xs font-bold shrink-0">
@@ -723,6 +736,7 @@ export default function LandingPage() {
         open={drawerOpen}
         onClose={closeDrawer}
         testimonials={testimonials}
+        lang={lang}
       />
     </div>
   )

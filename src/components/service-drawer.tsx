@@ -32,13 +32,21 @@ type Testimonial = {
   client_country: string
 }
 
-const DEFAULT_HIGHLIGHTS = ['Relaxation & stress relief', 'Self-care & pampering', 'Trying something new', 'A special treat']
-const DEFAULT_GOOD_TO_KNOW = ['Robes & slippers provided', 'Arrive 10 min early', 'Free cancellation up to 2h before', 'All levels welcome']
-const DEFAULT_INCLUDED = ['Full session treatment', 'Fresh robe & slippers', 'Herbal tea post-session', 'Professional therapist']
-const DEFAULT_FAQS = [
+const DEFAULT_HIGHLIGHTS_EN = ['Relaxation & stress relief', 'Self-care & pampering', 'Trying something new', 'A special treat']
+const DEFAULT_HIGHLIGHTS_AR = ['الاسترخاء وتخفيف التوتر', 'العناية الذاتية', 'تجربة شيء جديد', 'هدية خاصة']
+const DEFAULT_GOOD_TO_KNOW_EN = ['Robes & slippers provided', 'Arrive 10 min early', 'Free cancellation up to 2h before', 'All levels welcome']
+const DEFAULT_GOOD_TO_KNOW_AR = ['نوفر روب ونعال', 'احضر قبل 10 دقائق', 'إلغاء مجاني قبل ساعتين', 'جميع المستويات مرحب بها']
+const DEFAULT_INCLUDED_EN = ['Full session treatment', 'Fresh robe & slippers', 'Herbal tea post-session', 'Professional therapist']
+const DEFAULT_INCLUDED_AR = ['جلسة علاج كاملة', 'روب ونعال نظيفان', 'شاي أعشاب بعد الجلسة', 'معالج محترف']
+const DEFAULT_FAQS_EN = [
   { q: 'What should I wear?', a: 'Comfortable clothes. We provide a robe and slippers for your session.' },
   { q: 'Is it suitable for beginners?', a: 'Absolutely! Our therapists guide you through everything.' },
   { q: 'What if I need to cancel?', a: 'Free cancellation up to 2 hours before your booking.' },
+]
+const DEFAULT_FAQS_AR = [
+  { q: 'ماذا يجب أن ارتدي؟', a: 'ملابس مريحة. نوفر لك روب ونعال للجلسة.' },
+  { q: 'هل هو مناسب للمبتدئين؟', a: 'بالتأكيد! معالجونا يرشدونك خطوة بخطوة.' },
+  { q: 'ماذا لو احتجت للإلغاء؟', a: 'إلغاء مجاني حتى ساعتين قبل الحجز.' },
 ]
 
 type ServiceDrawerProps = {
@@ -46,9 +54,10 @@ type ServiceDrawerProps = {
   open: boolean
   onClose: () => void
   testimonials: Testimonial[]
+  lang?: 'en' | 'ar'
 }
 
-export function ServiceDrawer({ service, open, onClose, testimonials }: ServiceDrawerProps) {
+export function ServiceDrawer({ service, open, onClose, testimonials, lang = 'en' }: ServiceDrawerProps) {
   const [faqOpen, setFaqOpen] = useState<number | null>(null)
   const [visible, setVisible] = useState(false)
 
@@ -76,10 +85,10 @@ export function ServiceDrawer({ service, open, onClose, testimonials }: ServiceD
 
   if (!service) return null
 
-  const highlights = service.highlights?.filter(Boolean) || DEFAULT_HIGHLIGHTS
-  const goodToKnow = service.good_to_know?.filter(Boolean) || DEFAULT_GOOD_TO_KNOW
-  const whatsIncluded = service.whats_included?.filter(Boolean) || DEFAULT_INCLUDED
-  const faqs = service.faqs?.filter(f => f.q || f.a) || DEFAULT_FAQS
+  const highlights = service.highlights?.filter(Boolean) || (lang === 'ar' ? DEFAULT_HIGHLIGHTS_AR : DEFAULT_HIGHLIGHTS_EN)
+  const goodToKnow = service.good_to_know?.filter(Boolean) || (lang === 'ar' ? DEFAULT_GOOD_TO_KNOW_AR : DEFAULT_GOOD_TO_KNOW_EN)
+  const whatsIncluded = service.whats_included?.filter(Boolean) || (lang === 'ar' ? DEFAULT_INCLUDED_AR : DEFAULT_INCLUDED_EN)
+  const faqs = service.faqs?.filter(f => f.q || f.a) || (lang === 'ar' ? DEFAULT_FAQS_AR : DEFAULT_FAQS_EN)
 
   const serviceTestimonials = testimonials.filter(t => {
     const serviceWords = service.name_en.toLowerCase().split(' ')
@@ -135,7 +144,7 @@ export function ServiceDrawer({ service, open, onClose, testimonials }: ServiceD
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
               <div className="absolute bottom-3 left-4 right-4">
-                <h3 className="text-xl font-bold text-white drop-shadow-sm">{service.name_en}</h3>
+                <h3 className="text-xl font-bold text-white drop-shadow-sm">{lang === 'ar' && service.name_ar ? service.name_ar : service.name_en}</h3>
               </div>
             </div>
 
@@ -166,16 +175,16 @@ export function ServiceDrawer({ service, open, onClose, testimonials }: ServiceD
               </div>
             </div>
 
-            {service.description_en && (
+            {(lang === 'ar' ? service.description_ar : service.description_en) && (
               <div className="mb-5">
-                <h4 className="font-semibold text-slate-900 mb-1 text-sm">What to Expect</h4>
-                <p className="text-sm text-slate-600 leading-relaxed">{service.description_en}</p>
+                <h4 className="font-semibold text-slate-900 mb-1 text-sm">{lang === 'ar' ? 'ما يمكنك توقعه' : 'What to Expect'}</h4>
+                <p className="text-sm text-slate-600 leading-relaxed">{lang === 'ar' && service.description_ar ? service.description_ar : service.description_en}</p>
               </div>
             )}
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
               <div className="bg-teal-50 rounded-xl p-3">
-                <h4 className="text-xs font-semibold text-teal-800 uppercase tracking-wider mb-1.5">Perfect For</h4>
+                <h4 className="text-xs font-semibold text-teal-800 uppercase tracking-wider mb-1.5">{lang === 'ar' ? 'مناسب لـ' : 'Perfect For'}</h4>
                 <ul className="space-y-1">
                   {highlights.map((item, i) => (
                     <li key={i} className="text-xs text-teal-700 flex items-start gap-1.5">
@@ -186,7 +195,7 @@ export function ServiceDrawer({ service, open, onClose, testimonials }: ServiceD
                 </ul>
               </div>
               <div className="bg-amber-50 rounded-xl p-3">
-                <h4 className="text-xs font-semibold text-amber-800 uppercase tracking-wider mb-1.5">Good to Know</h4>
+                <h4 className="text-xs font-semibold text-amber-800 uppercase tracking-wider mb-1.5">{lang === 'ar' ? 'معلومات مفيدة' : 'Good to Know'}</h4>
                 <ul className="space-y-1">
                   {goodToKnow.map((item, i) => (
                     <li key={i} className="text-xs text-amber-700 flex items-start gap-1.5">
@@ -199,7 +208,7 @@ export function ServiceDrawer({ service, open, onClose, testimonials }: ServiceD
             </div>
 
             <div className="mb-5">
-              <h4 className="font-semibold text-slate-900 mb-2 text-sm">What&apos;s Included</h4>
+              <h4 className="font-semibold text-slate-900 mb-2 text-sm">{lang === 'ar' ? 'ما يشمل' : 'What&apos;s Included'}</h4>
               <div className="space-y-2">
                 {whatsIncluded.map((item, i) => (
                   <div key={i} className="flex items-center gap-2">
@@ -214,7 +223,7 @@ export function ServiceDrawer({ service, open, onClose, testimonials }: ServiceD
 
             {faqs.length > 0 && (
               <div className="mb-5">
-                <h4 className="font-semibold text-slate-900 mb-2 text-sm">Frequently Asked</h4>
+                <h4 className="font-semibold text-slate-900 mb-2 text-sm">{lang === 'ar' ? 'الأسئلة الشائعة' : 'Frequently Asked'}</h4>
                 <div className="space-y-1 border border-slate-200 rounded-xl overflow-hidden">
                   {faqs.map((item, i) => (
                     <div key={i} className="border-b border-slate-100 last:border-b-0">
@@ -244,7 +253,7 @@ export function ServiceDrawer({ service, open, onClose, testimonials }: ServiceD
 
             {serviceTestimonials.length > 0 && (
               <div className="mb-5">
-                <h4 className="font-semibold text-slate-900 mb-2 text-sm">Guest Reviews</h4>
+                <h4 className="font-semibold text-slate-900 mb-2 text-sm">{lang === 'ar' ? 'آراء الضيوف' : 'Guest Reviews'}</h4>
                 <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
                   {serviceTestimonials.map(t => (
                     <div key={t.id} className="min-w-[240px] bg-slate-50 rounded-xl p-3 shrink-0">
@@ -253,7 +262,7 @@ export function ServiceDrawer({ service, open, onClose, testimonials }: ServiceD
                           <span key={i} className="text-amber-500 text-xs">★</span>
                         ))}
                       </div>
-                      <p className="text-xs text-slate-600 mb-2 leading-relaxed">&ldquo;{t.comment_en}&rdquo;</p>
+                      <p className="text-xs text-slate-600 mb-2 leading-relaxed">&ldquo;{lang === 'ar' && t.comment_ar ? t.comment_ar : t.comment_en}&rdquo;</p>
                       <div className="flex items-center gap-1.5">
                         <div className="size-6 rounded-full bg-teal-700 flex items-center justify-center text-white text-[10px] font-bold">
                           {t.client_name.charAt(0)}
@@ -274,7 +283,7 @@ export function ServiceDrawer({ service, open, onClose, testimonials }: ServiceD
                 href={`/book/${service.id}`}
                 className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-[#0A6E74] to-[#065256] text-white font-bold py-3.5 rounded-xl text-sm hover:shadow-lg hover:shadow-teal-900/20 transition-all active:scale-[0.98]"
               >
-                Book This Session — {service.price.toLocaleString('en-EG')} EGP
+                {(lang === 'ar' ? 'احجز هذه الجلسة' : 'Book This Session') + ' — ' + service.price.toLocaleString('en-EG') + ' EGP'}
                 {service.discount_percent && service.discount_percent > 0 && (
                   <span className="text-[10px] bg-white/20 px-2 py-0.5 rounded-full">
                     -{service.discount_percent}%
@@ -288,7 +297,7 @@ export function ServiceDrawer({ service, open, onClose, testimonials }: ServiceD
                 className="w-full flex items-center justify-center gap-2 border-2 border-[#25D366] text-[#25D366] font-semibold py-3 rounded-xl text-sm hover:bg-[#25D366] hover:text-white transition-all active:scale-[0.98]"
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-                Questions? Ask on WhatsApp
+                {lang === 'ar' ? 'أسئلة؟ اسأل على واتساب' : 'Questions? Ask on WhatsApp'}
               </a>
             </div>
           </div>
