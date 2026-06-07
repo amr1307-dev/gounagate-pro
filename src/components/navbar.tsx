@@ -5,9 +5,10 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import { cn } from '@/lib/utils'
+import { useLang } from '@/lib/lang-context'
 
 export function Navbar() {
-  const [lang, setLang] = useState<'en' | 'ar'>('en')
+  const { lang, setLang } = useLang()
   const [menuOpen, setMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const pathname = usePathname()
@@ -21,27 +22,8 @@ export function Navbar() {
   }, [])
 
   const toggleLang = () => {
-    const newLang = lang === 'en' ? 'ar' : 'en'
-    setLang(newLang)
-    document.documentElement.dir = newLang === 'ar' ? 'rtl' : 'ltr'
-    document.documentElement.lang = newLang
-    try {
-      localStorage.setItem('site_lang', newLang)
-      window.dispatchEvent(new Event('langchange'))
-    } catch {}
+    setLang(lang === 'en' ? 'ar' : 'en')
   }
-
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem('site_lang') as 'en' | 'ar' | null
-      if (stored === 'ar' || stored === 'en') {
-        setLang(stored)
-        document.documentElement.dir = stored === 'ar' ? 'rtl' : 'ltr'
-        document.documentElement.lang = stored
-        window.dispatchEvent(new Event('langchange'))
-      }
-    } catch {}
-  }, [])
 
   const isDashboard = pathname.startsWith('/dashboard')
   const isPublic = !isDashboard

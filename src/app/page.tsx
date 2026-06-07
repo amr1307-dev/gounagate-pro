@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
+import { useLang } from '@/lib/lang-context'
 import { ServiceDrawer } from '@/components/service-drawer'
 
 type Package = {
@@ -117,34 +118,12 @@ export default function LandingPage() {
   const [allPackages, setAllPackages] = useState<Package[]>([])
   const [loading, setLoading] = useState(true)
   const [activeCategory, setActiveCategory] = useState<string>('all')
+  const { lang, t } = useLang()
   const [selectedService, setSelectedService] = useState<Package | null>(null)
   const [drawerOpen, setDrawerOpen] = useState(false)
-  const [lang, setLang] = useState<'en' | 'ar'>('en')
   const [currentSlide, setCurrentSlide] = useState(0)
 
   const servicesRef = useRef<HTMLElement>(null)
-
-  useEffect(() => {
-    const stored = (() => { try { return localStorage.getItem('site_lang') } catch { return null } })()
-    if (stored === 'ar' || stored === 'en') {
-      setLang(stored)
-      document.documentElement.dir = stored === 'ar' ? 'rtl' : 'ltr'
-      document.documentElement.lang = stored
-    } else {
-      const userLang = navigator.language || navigator.languages?.[0] || 'en'
-      if (userLang.startsWith('ar')) {
-        setLang('ar')
-        document.documentElement.dir = 'rtl'
-        document.documentElement.lang = 'ar'
-      }
-    }
-    const handler = () => {
-      const stored = (() => { try { return localStorage.getItem('site_lang') } catch { return null } })()
-      if (stored === 'ar' || stored === 'en') setLang(stored)
-    }
-    window.addEventListener('langchange', handler)
-    return () => window.removeEventListener('langchange', handler)
-  }, [])
 
   useEffect(() => {
     Promise.all([
@@ -178,8 +157,6 @@ export default function LandingPage() {
   const filtered = activeCategory === 'all'
     ? allPackages
     : allPackages.filter(p => p.category_id === activeCategory)
-
-  const t = (en: string, ar: string) => lang === 'ar' ? ar : en
 
   const scrollToServices = () => {
     servicesRef.current?.scrollIntoView({ behavior: 'smooth' })
