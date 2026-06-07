@@ -1,14 +1,28 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
+
+type Lang = 'en' | 'ar'
+function useLang(): Lang {
+  const [lang, setLang] = useState<Lang>('en')
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('dashboard_lang') as Lang | null
+      if (stored === 'ar' || stored === 'en') setLang(stored)
+    } catch {}
+  }, [])
+  return lang
+}
+const tr = (lang: Lang, en: string, ar: string) => lang === 'ar' ? ar : en
 
 type Category = { id: string; name_en: string; name_ar: string; slug: string; icon: string; sort_order: number }
 type Package = { id: string; name_en: string; name_ar: string; price: number; duration_minutes: number; is_active: boolean; categories: { name_en: string } }
 type Testimonial = { id: string; client_name: string; rating: number; comment_en: string; client_country: string; is_visible: boolean }
 
 export function SettingsForm({ categories, packages, testimonials }: { categories: Category[]; packages: Package[]; testimonials: Testimonial[] }) {
+  const lang = useLang()
   const [tab, setTab] = useState<'packages' | 'categories' | 'testimonials'>('packages')
   const router = useRouter()
   const supabase = createClient()
@@ -16,8 +30,8 @@ export function SettingsForm({ categories, packages, testimonials }: { categorie
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">Settings</h1>
-        <p className="text-sm text-slate-500">Manage packages, categories, and testimonials</p>
+        <h1 className="text-2xl font-bold text-slate-900">{tr(lang, 'Settings', 'الإعدادات')}</h1>
+        <p className="text-sm text-slate-500">{tr(lang, 'Manage packages, categories, and testimonials', 'إدارة الباقات والتصنيفات وآراء العملاء')}</p>
       </div>
 
       <div className="flex gap-2 border-b border-slate-200 pb-0">
@@ -31,7 +45,7 @@ export function SettingsForm({ categories, packages, testimonials }: { categorie
                 : 'border-transparent text-slate-400 hover:text-slate-600'
             }`}
           >
-            {t === 'packages' ? '📦 Packages' : t === 'categories' ? '📂 Categories' : '💬 Testimonials'}
+            {t === 'packages' ? '📦 ' + tr(lang, 'Packages', 'الباقات') : t === 'categories' ? '📂 ' + tr(lang, 'Categories', 'التصنيفات') : '💬 ' + tr(lang, 'Testimonials', 'الآراء')}
           </button>
         ))}
       </div>
@@ -44,6 +58,7 @@ export function SettingsForm({ categories, packages, testimonials }: { categorie
 }
 
 function PackagesEditor({ packages, categories, supabase, router }: { packages: Package[]; categories: Category[]; supabase: any; router: any }) {
+  const lang = useLang()
   const [editing, setEditing] = useState<string | null>(null)
   const [form, setForm] = useState({ name_en: '', name_ar: '', price: 0, duration_minutes: 60, category_id: '' })
   const [saving, setSaving] = useState(false)
@@ -75,7 +90,7 @@ function PackagesEditor({ packages, categories, supabase, router }: { packages: 
   }
 
   const deletePkg = async (id: string) => {
-    if (!confirm('Delete this package?')) return
+    if (!confirm(tr(lang, 'Delete this package?', 'حذف هذه الباقة؟'))) return
     await supabase.from('packages').delete().eq('id', id)
     router.refresh()
   }
@@ -83,12 +98,12 @@ function PackagesEditor({ packages, categories, supabase, router }: { packages: 
   return (
     <div className="glass p-6 space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="font-semibold text-slate-900">All Packages</h3>
-        <button onClick={createNew} disabled={saving} className="btn-primary text-sm px-4 py-2">+ Add Package</button>
+        <h3 className="font-semibold text-slate-900">{tr(lang, 'All Packages', 'جميع الباقات')}</h3>
+        <button onClick={createNew} disabled={saving} className="btn-primary text-sm px-4 py-2">+ {tr(lang, 'Add Package', 'إضافة باقة')}</button>
       </div>
 
       {packages.length === 0 ? (
-        <p className="text-sm text-slate-400 text-center py-8">No packages yet. Create your first one.</p>
+        <p className="text-sm text-slate-400 text-center py-8">{tr(lang, 'No packages yet. Create your first one.', 'لا توجد باقات بعد. أنشئ أول باقة.')}</p>
       ) : (
         <div className="space-y-3">
           {packages.map(p => (
@@ -99,8 +114,8 @@ function PackagesEditor({ packages, categories, supabase, router }: { packages: 
                     <input className="input-field w-40 text-sm" value={form.name_en} onChange={e => setForm(f => ({ ...f, name_en: e.target.value }))} />
                     <input className="input-field w-28 text-sm" type="number" value={form.price} onChange={e => setForm(f => ({ ...f, price: parseInt(e.target.value) || 0 }))} />
                     <input className="input-field w-20 text-sm" type="number" value={form.duration_minutes} onChange={e => setForm(f => ({ ...f, duration_minutes: parseInt(e.target.value) || 60 }))} />
-                    <button onClick={() => updatePackage(p.id)} className="btn-primary text-xs px-3 py-1">Save</button>
-                    <button onClick={() => setEditing(null)} className="btn-secondary text-xs px-3 py-1">Cancel</button>
+                    <button onClick={() => updatePackage(p.id)} className="btn-primary text-xs px-3 py-1">{tr(lang, 'Save', 'حفظ')}</button>
+                    <button onClick={() => setEditing(null)} className="btn-secondary text-xs px-3 py-1">{tr(lang, 'Cancel', 'إلغاء')}</button>
                   </div>
                 ) : (
                   <>
@@ -112,11 +127,11 @@ function PackagesEditor({ packages, categories, supabase, router }: { packages: 
               {editing !== p.id && (
                 <div className="flex items-center gap-2 shrink-0 ml-4">
                   <span className={`text-xs px-2 py-0.5 rounded-full ${p.is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-400'}`}>
-                    {p.is_active ? 'Active' : 'Inactive'}
+                    {p.is_active ? tr(lang, 'Active', 'نشط') : tr(lang, 'Inactive', 'غير نشط')}
                   </span>
-                  <button onClick={() => { setEditing(p.id); setForm({ name_en: p.name_en, name_ar: p.name_ar, price: p.price, duration_minutes: p.duration_minutes, category_id: '' }) }} className="text-xs text-[#0A6E74] hover:underline">Edit</button>
-                  <button onClick={() => toggleActive(p.id, p.is_active)} className="text-xs text-amber-600 hover:underline">{p.is_active ? 'Disable' : 'Enable'}</button>
-                  <button onClick={() => deletePkg(p.id)} className="text-xs text-red-400 hover:underline">Delete</button>
+                  <button onClick={() => { setEditing(p.id); setForm({ name_en: p.name_en, name_ar: p.name_ar, price: p.price, duration_minutes: p.duration_minutes, category_id: '' }) }} className="text-xs text-[#0A6E74] hover:underline">{tr(lang, 'Edit', 'تعديل')}</button>
+                  <button onClick={() => toggleActive(p.id, p.is_active)} className="text-xs text-amber-600 hover:underline">{p.is_active ? tr(lang, 'Disable', 'تعطيل') : tr(lang, 'Enable', 'تفعيل')}</button>
+                  <button onClick={() => deletePkg(p.id)} className="text-xs text-red-400 hover:underline">{tr(lang, 'Delete', 'حذف')}</button>
                 </div>
               )}
             </div>
@@ -128,6 +143,7 @@ function PackagesEditor({ packages, categories, supabase, router }: { packages: 
 }
 
 function CategoriesEditor({ categories, supabase, router }: { categories: Category[]; supabase: any; router: any }) {
+  const lang = useLang()
   const [form, setForm] = useState({ name_en: '', name_ar: '', icon: '💆', sort_order: 0 })
   const [saving, setSaving] = useState(false)
 
@@ -147,29 +163,29 @@ function CategoriesEditor({ categories, supabase, router }: { categories: Catego
   }
 
   const deleteCat = async (id: string) => {
-    if (!confirm('Delete this category? This will also delete all packages in it.')) return
+    if (!confirm(tr(lang, 'Delete this category? This will also delete all packages in it.', 'حذف هذا التصنيف؟ سيتم حذف جميع الباقات المرتبطة به.'))) return
     await supabase.from('categories').delete().eq('id', id)
     router.refresh()
   }
 
   return (
     <div className="glass p-6 space-y-4">
-      <h3 className="font-semibold text-slate-900">Categories</h3>
+      <h3 className="font-semibold text-slate-900">{tr(lang, 'Categories', 'التصنيفات')}</h3>
 
       <div className="flex flex-wrap gap-2 items-end">
         <div>
-          <label className="text-xs text-slate-400 block mb-1">Name (EN)</label>
+          <label className="text-xs text-slate-400 block mb-1">{tr(lang, 'Name (EN)', 'الاسم (إنجليزي)')}</label>
           <input className="input-field w-40 text-sm" value={form.name_en} onChange={e => setForm(f => ({ ...f, name_en: e.target.value }))} />
         </div>
         <div>
-          <label className="text-xs text-slate-400 block mb-1">Name (AR)</label>
+          <label className="text-xs text-slate-400 block mb-1">{tr(lang, 'Name (AR)', 'الاسم (عربي)')}</label>
           <input className="input-field w-40 text-sm" value={form.name_ar} onChange={e => setForm(f => ({ ...f, name_ar: e.target.value }))} />
         </div>
         <div>
-          <label className="text-xs text-slate-400 block mb-1">Icon</label>
+          <label className="text-xs text-slate-400 block mb-1">{tr(lang, 'Icon', 'أيقونة')}</label>
           <input className="input-field w-20 text-sm" value={form.icon} onChange={e => setForm(f => ({ ...f, icon: e.target.value }))} />
         </div>
-        <button onClick={createNew} disabled={saving} className="btn-primary text-sm px-4 py-2.5">+ Add</button>
+        <button onClick={createNew} disabled={saving} className="btn-primary text-sm px-4 py-2.5">+ {tr(lang, 'Add', 'إضافة')}</button>
       </div>
 
       <div className="space-y-2">
@@ -183,7 +199,7 @@ function CategoriesEditor({ categories, supabase, router }: { categories: Catego
                 <span className="text-xs text-slate-300 ml-2">/{c.slug}</span>
               </div>
             </div>
-            <button onClick={() => deleteCat(c.id)} className="text-xs text-red-400 hover:underline">Delete</button>
+            <button onClick={() => deleteCat(c.id)} className="text-xs text-red-400 hover:underline">{tr(lang, 'Delete', 'حذف')}</button>
           </div>
         ))}
       </div>
@@ -192,6 +208,7 @@ function CategoriesEditor({ categories, supabase, router }: { categories: Catego
 }
 
 function TestimonialsEditor({ testimonials, supabase, router }: { testimonials: Testimonial[]; supabase: any; router: any }) {
+  const lang = useLang()
   const [form, setForm] = useState({ client_name: '', rating: 5, comment_en: '', client_country: '' })
   const [saving, setSaving] = useState(false)
 
@@ -214,33 +231,33 @@ function TestimonialsEditor({ testimonials, supabase, router }: { testimonials: 
   }
 
   const deleteTest = async (id: string) => {
-    if (!confirm('Delete this testimonial?')) return
+    if (!confirm(tr(lang, 'Delete this testimonial?', 'حذف هذا الرأي؟'))) return
     await supabase.from('testimonials').delete().eq('id', id)
     router.refresh()
   }
 
   return (
     <div className="glass p-6 space-y-4">
-      <h3 className="font-semibold text-slate-900">Testimonials</h3>
+      <h3 className="font-semibold text-slate-900">{tr(lang, 'Testimonials', 'آراء العملاء')}</h3>
 
       <div className="flex flex-wrap gap-2 items-end">
         <div>
-          <label className="text-xs text-slate-400 block mb-1">Name</label>
+          <label className="text-xs text-slate-400 block mb-1">{tr(lang, 'Name', 'الاسم')}</label>
           <input className="input-field w-36 text-sm" value={form.client_name} onChange={e => setForm(f => ({ ...f, client_name: e.target.value }))} />
         </div>
         <div>
-          <label className="text-xs text-slate-400 block mb-1">Rating (1-5)</label>
+          <label className="text-xs text-slate-400 block mb-1">{tr(lang, 'Rating (1-5)', 'التقييم (1-5)')}</label>
           <input className="input-field w-16 text-sm" type="number" min={1} max={5} value={form.rating} onChange={e => setForm(f => ({ ...f, rating: parseInt(e.target.value) || 5 }))} />
         </div>
         <div>
-          <label className="text-xs text-slate-400 block mb-1">Country</label>
+          <label className="text-xs text-slate-400 block mb-1">{tr(lang, 'Country', 'الدولة')}</label>
           <input className="input-field w-28 text-sm" value={form.client_country} onChange={e => setForm(f => ({ ...f, client_country: e.target.value }))} />
         </div>
         <div>
-          <label className="text-xs text-slate-400 block mb-1">Comment</label>
+          <label className="text-xs text-slate-400 block mb-1">{tr(lang, 'Comment', 'التعليق')}</label>
           <input className="input-field w-60 text-sm" value={form.comment_en} onChange={e => setForm(f => ({ ...f, comment_en: e.target.value }))} />
         </div>
-        <button onClick={createNew} disabled={saving} className="btn-primary text-sm px-4 py-2.5">+ Add</button>
+        <button onClick={createNew} disabled={saving} className="btn-primary text-sm px-4 py-2.5">+ {tr(lang, 'Add', 'إضافة')}</button>
       </div>
 
       <div className="space-y-2">
@@ -255,8 +272,8 @@ function TestimonialsEditor({ testimonials, supabase, router }: { testimonials: 
               <p className="text-xs text-slate-500 truncate">{t.comment_en}</p>
             </div>
             <div className="flex items-center gap-2 shrink-0 ml-4">
-              <button onClick={() => toggleVisible(t.id, t.is_visible)} className="text-xs text-amber-600 hover:underline">{t.is_visible ? 'Hide' : 'Show'}</button>
-              <button onClick={() => deleteTest(t.id)} className="text-xs text-red-400 hover:underline">Delete</button>
+              <button onClick={() => toggleVisible(t.id, t.is_visible)} className="text-xs text-amber-600 hover:underline">{t.is_visible ? tr(lang, 'Hide', 'إخفاء') : tr(lang, 'Show', 'إظهار')}</button>
+              <button onClick={() => deleteTest(t.id)} className="text-xs text-red-400 hover:underline">{tr(lang, 'Delete', 'حذف')}</button>
             </div>
           </div>
         ))}

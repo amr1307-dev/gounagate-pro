@@ -37,19 +37,26 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'name_en and price are required' }, { status: 400 })
     }
 
+    const insertData: Record<string, any> = {
+      category_id: body.category_id || null,
+      name_en: body.name_en,
+      name_ar: body.name_ar || body.name_en,
+      description_en: body.description_en || '',
+      description_ar: body.description_ar || '',
+      price: body.price,
+      duration_minutes: body.duration_minutes || 60,
+      image_url: body.image_url || null,
+      is_active: body.is_active !== undefined ? body.is_active : true,
+    }
+    const jsonFields = ['highlights', 'good_to_know', 'whats_included', 'faqs']
+    for (const f of jsonFields) {
+      if (body[f]) insertData[f] = body[f]
+    }
+    if (body.video_url !== undefined) insertData.video_url = body.video_url
+
     const { data, error } = await supabase
       .from('packages')
-      .insert({
-        category_id: body.category_id || null,
-        name_en: body.name_en,
-        name_ar: body.name_ar || body.name_en,
-        description_en: body.description_en || '',
-        description_ar: body.description_ar || '',
-        price: body.price,
-        duration_minutes: body.duration_minutes || 60,
-        image_url: body.image_url || null,
-        is_active: body.is_active !== undefined ? body.is_active : true,
-      })
+      .insert(insertData)
       .select()
       .single()
 
@@ -69,7 +76,7 @@ export async function PUT(req: Request) {
     const supabase = createAdminClient()
     const updateData: Record<string, any> = {}
 
-    const allowed = ['category_id', 'name_en', 'name_ar', 'description_en', 'description_ar', 'price', 'duration_minutes', 'image_url', 'is_active']
+    const allowed = ['category_id', 'name_en', 'name_ar', 'description_en', 'description_ar', 'price', 'duration_minutes', 'image_url', 'is_active', 'highlights', 'good_to_know', 'whats_included', 'faqs', 'video_url']
     for (const key of allowed) {
       if (fields[key] !== undefined) updateData[key] = fields[key]
     }

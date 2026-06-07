@@ -15,6 +15,8 @@ type Package = {
   price: number
   duration_minutes: number
   image_url: string | null
+  discount_percent?: number
+  original_price?: number
 }
 
 type Category = {
@@ -393,15 +395,36 @@ export default function LandingPage() {
                       className="w-full h-full object-cover service-card-img"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-full text-xs font-bold text-slate-800 shadow-sm">
-                      {pkg.duration_minutes} min
+                    <div className="absolute top-3 right-3 flex gap-1.5">
+                      {pkg.discount_percent && pkg.discount_percent > 0 && (
+                        <span className="bg-red-500 text-white px-2 py-0.5 rounded-full text-[10px] font-bold shadow-sm">
+                          -{pkg.discount_percent}%
+                        </span>
+                      )}
+                      <span className="bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-full text-xs font-bold text-slate-800 shadow-sm">
+                        {pkg.duration_minutes} min
+                      </span>
                     </div>
                   </div>
                   <div className="p-4">
                     <h3 className="font-bold text-slate-900">{pkg.name_en}</h3>
                     <p className="text-xs text-slate-400 mt-0.5 line-clamp-2">{pkg.description_en}</p>
                     <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-100">
-                      <span className="price-tag text-base">{pkg.price.toLocaleString('en-EG')} EGP</span>
+                      <div>
+                        {pkg.discount_percent && pkg.discount_percent > 0 ? (
+                          <div className="flex items-center gap-2">
+                            <span className="price-tag text-base text-red-600">{pkg.price.toLocaleString('en-EG')} EGP</span>
+                            <span className="text-xs text-slate-400 line-through">
+                              {(pkg.original_price || Math.round(pkg.price / (1 - pkg.discount_percent / 100))).toLocaleString('en-EG')} EGP
+                            </span>
+                            <span className="text-[10px] font-bold text-white bg-red-500 px-1.5 py-0.5 rounded-full">
+                              -{pkg.discount_percent}%
+                            </span>
+                          </div>
+                        ) : (
+                          <span className="price-tag text-base">{pkg.price.toLocaleString('en-EG')} EGP</span>
+                        )}
+                      </div>
                       <div className="flex gap-1.5">
                         <button
                           onClick={() => openDrawer(pkg)}

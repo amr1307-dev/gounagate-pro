@@ -14,88 +14,13 @@ type Package = {
   price: number
   duration_minutes: number
   image_url: string | null
-}
-
-type ServiceContent = {
-  perfectFor: string[]
-  goodToKnow: string[]
-  whatsIncluded: string[]
-  faq: { q: string; a: string }[]
-}
-
-const contentMap: Record<string, Partial<ServiceContent>> = {
-  'massage': {
-    perfectFor: ['Deep muscle tension relief', 'Post-flight recovery', 'Stress & anxiety relief', 'First-time spa visitors'],
-    goodToKnow: ['Robes & slippers provided', 'Communicate pressure preference', 'Arrive 10 min early', 'Free cancellation up to 2h before'],
-    whatsIncluded: ['Full-body massage session', 'Aromatherapy oil', 'Fresh robe & slippers', 'Herbal tea post-session'],
-    faq: [
-      { q: 'What should I wear?', a: 'We provide a robe and slippers. You undress to your comfort level — our therapists are trained to ensure you are always properly draped.' },
-      { q: 'Is the massage painful?', a: 'A good massage should feel like "good hurt" — deep pressure on knots. Always tell your therapist if anything is too intense.' },
-      { q: 'Can I combine with other treatments?', a: 'Absolutely! Many guests pair a massage with a salt cave session or sauna for the ultimate relaxation experience.' },
-    ],
-  },
-  'salt-cave': {
-    perfectFor: ['Stress relief & relaxation', 'Asthma, allergies, sinus issues', 'First-time spa visitors', 'Post-flight recovery'],
-    goodToKnow: ['Natural halotherapy', 'Not for severe claustrophobia', 'Arrive 10 min early', 'Free cancellation up to 2h before'],
-    whatsIncluded: ['45-min salt cave session', 'Fresh robe & slippers', 'Herbal tea after session', 'Private sanitized cave room'],
-    faq: [
-      { q: 'What should I wear?', a: 'Comfortable clothes. We provide a robe and slippers. You relax on a lounge chair inside the cave.' },
-      { q: 'Is the salt cave hygienic?', a: 'Yes. The cave is sanitized between each session. The salt itself is naturally antibacterial.' },
-      { q: 'Can I combine with a massage?', a: 'Yes! Many guests book salt cave + massage for the ultimate wellness experience.' },
-    ],
-  },
-  'sauna': {
-    perfectFor: ['Detox & cleansing', 'Muscle recovery after exercise', 'Skin health improvement', 'Relaxation & stress relief'],
-    goodToKnow: ['Stay hydrated before & after', 'Limit sessions to 15-20 min', 'Not recommended if pregnant', 'Cool-down area available'],
-    whatsIncluded: ['20-min sauna session', 'Cold plunge access', 'Fresh towel & robe', 'Infused water station'],
-    faq: [
-      { q: 'How long should I stay in the sauna?', a: '15-20 minutes is ideal. Listen to your body — if you feel dizzy, step out.' },
-      { q: 'What should I bring?', a: 'We provide towels, robes, and slippers. A swimsuit is optional.' },
-      { q: 'Can I use the sauna if I have health issues?', a: 'Consult your doctor if you have heart conditions, low blood pressure, or are pregnant.' },
-    ],
-  },
-  'beauty': {
-    perfectFor: ['Skin rejuvenation', 'Special occasion prep', 'Anti-aging care', 'Relaxation & self-care'],
-    goodToKnow: ['No makeup needed', 'Results visible immediately', 'All skin types welcome', 'Free consultation available'],
-    whatsIncluded: ['Professional facial treatment', 'Premium skincare products', 'Neck & shoulder massage', 'Personalized skincare advice'],
-    faq: [
-      { q: 'Will my skin be red after?', a: 'Mild redness is normal and fades within 30 minutes. Most guests leave with a visible glow.' },
-      { q: 'How often should I get a facial?', a: 'Monthly facials are ideal for maintaining healthy, glowing skin.' },
-      { q: 'Can I wear makeup after?', a: 'We recommend letting your skin breathe for a few hours after the treatment.' },
-    ],
-  },
-}
-
-const defaultContent: ServiceContent = {
-  perfectFor: ['Relaxation & stress relief', 'Self-care & pampering', 'Trying something new', 'A special treat'],
-  goodToKnow: ['Robes & slippers provided', 'Arrive 10 min early', 'Free cancellation up to 2h before', 'All levels welcome'],
-  whatsIncluded: ['Full session treatment', 'Fresh robe & slippers', 'Herbal tea post-session', 'Professional therapist'],
-  faq: [
-    { q: 'What should I wear?', a: 'Comfortable clothes. We provide a robe and slippers for your session.' },
-    { q: 'Is it suitable for beginners?', a: 'Absolutely! Our therapists guide you through everything.' },
-    { q: 'What if I need to cancel?', a: 'Free cancellation up to 2 hours before your booking.' },
-  ],
-}
-
-function getCategorySlug(name: string): string {
-  const n = name.toLowerCase()
-  if (n.includes('salt') || n.includes('cave')) return 'salt-cave'
-  if (n.includes('massage') || n.includes('swedish') || n.includes('hot stone') || n.includes('thai')) return 'massage'
-  if (n.includes('sauna')) return 'sauna'
-  if (n.includes('facial') || n.includes('beauty') || n.includes('manicure') || n.includes('pedicure')) return 'beauty'
-  return 'default'
-}
-
-function getServiceContent(service: Package): ServiceContent {
-  const slug = getCategorySlug(service.name_en)
-  const matched = contentMap[slug]
-  if (!matched) return defaultContent
-  return {
-    perfectFor: matched.perfectFor ?? defaultContent.perfectFor,
-    goodToKnow: matched.goodToKnow ?? defaultContent.goodToKnow,
-    whatsIncluded: matched.whatsIncluded ?? defaultContent.whatsIncluded,
-    faq: matched.faq ?? defaultContent.faq,
-  }
+  highlights?: string[]
+  good_to_know?: string[]
+  whats_included?: string[]
+  faqs?: { q: string; a: string }[]
+  video_url?: string | null
+  discount_percent?: number
+  original_price?: number
 }
 
 type Testimonial = {
@@ -106,6 +31,15 @@ type Testimonial = {
   comment_ar: string
   client_country: string
 }
+
+const DEFAULT_HIGHLIGHTS = ['Relaxation & stress relief', 'Self-care & pampering', 'Trying something new', 'A special treat']
+const DEFAULT_GOOD_TO_KNOW = ['Robes & slippers provided', 'Arrive 10 min early', 'Free cancellation up to 2h before', 'All levels welcome']
+const DEFAULT_INCLUDED = ['Full session treatment', 'Fresh robe & slippers', 'Herbal tea post-session', 'Professional therapist']
+const DEFAULT_FAQS = [
+  { q: 'What should I wear?', a: 'Comfortable clothes. We provide a robe and slippers for your session.' },
+  { q: 'Is it suitable for beginners?', a: 'Absolutely! Our therapists guide you through everything.' },
+  { q: 'What if I need to cancel?', a: 'Free cancellation up to 2 hours before your booking.' },
+]
 
 type ServiceDrawerProps = {
   service: Package | null
@@ -119,19 +53,13 @@ export function ServiceDrawer({ service, open, onClose, testimonials }: ServiceD
   const [visible, setVisible] = useState(false)
 
   useEffect(() => {
-    if (open) {
-      requestAnimationFrame(() => setVisible(true))
-    } else {
-      setVisible(false)
-    }
+    if (open) requestAnimationFrame(() => setVisible(true))
+    else setVisible(false)
   }, [open])
 
   useEffect(() => {
-    if (open) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = ''
-    }
+    if (open) document.body.style.overflow = 'hidden'
+    else document.body.style.overflow = ''
     return () => { document.body.style.overflow = '' }
   }, [open])
 
@@ -141,17 +69,18 @@ export function ServiceDrawer({ service, open, onClose, testimonials }: ServiceD
   }, [onClose])
 
   useEffect(() => {
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && open) close()
-    }
+    const handleKey = (e: KeyboardEvent) => { if (e.key === 'Escape' && open) close() }
     window.addEventListener('keydown', handleKey)
     return () => window.removeEventListener('keydown', handleKey)
   }, [open, close])
 
   if (!service) return null
 
-  const content = getServiceContent(service)
-  const slug = getCategorySlug(service.name_en)
+  const highlights = service.highlights?.filter(Boolean) || DEFAULT_HIGHLIGHTS
+  const goodToKnow = service.good_to_know?.filter(Boolean) || DEFAULT_GOOD_TO_KNOW
+  const whatsIncluded = service.whats_included?.filter(Boolean) || DEFAULT_INCLUDED
+  const faqs = service.faqs?.filter(f => f.q || f.a) || DEFAULT_FAQS
+
   const serviceTestimonials = testimonials.filter(t => {
     const serviceWords = service.name_en.toLowerCase().split(' ')
     const commentLower = t.comment_en.toLowerCase()
@@ -189,11 +118,21 @@ export function ServiceDrawer({ service, open, onClose, testimonials }: ServiceD
 
           <div className="px-4 pb-6">
             <div className="relative h-52 sm:h-64 rounded-2xl overflow-hidden mb-4 -mx-0">
-              <img
-                src={service.image_url || `/api/placeholder?name=${encodeURIComponent(service.name_en)}`}
-                alt={service.name_en}
-                className="w-full h-full object-cover"
-              />
+              {service.video_url ? (
+                <iframe
+                  src={service.video_url.replace('watch?v=', 'embed/')}
+                  className="w-full h-full"
+                  allowFullScreen
+                  loading="lazy"
+                  title={service.name_en}
+                />
+              ) : (
+                <img
+                  src={service.image_url || `/api/placeholder?name=${encodeURIComponent(service.name_en)}`}
+                  alt={service.name_en}
+                  className="w-full h-full object-cover"
+                />
+              )}
               <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
               <div className="absolute bottom-3 left-4 right-4">
                 <h3 className="text-xl font-bold text-white drop-shadow-sm">{service.name_en}</h3>
@@ -202,9 +141,23 @@ export function ServiceDrawer({ service, open, onClose, testimonials }: ServiceD
 
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <span className="text-[#D4A843] font-bold text-lg">
-                  {service.price.toLocaleString('en-EG')} EGP
-                </span>
+                {service.discount_percent && service.discount_percent > 0 ? (
+                  <>
+                    <span className="text-red-600 font-bold text-lg">
+                      {service.price.toLocaleString('en-EG')} EGP
+                    </span>
+                    <span className="text-sm text-slate-400 line-through">
+                      {(service.original_price || Math.round(service.price / (1 - service.discount_percent / 100))).toLocaleString('en-EG')} EGP
+                    </span>
+                    <span className="text-[10px] font-bold text-white bg-red-500 px-1.5 py-0.5 rounded-full">
+                      -{service.discount_percent}%
+                    </span>
+                  </>
+                ) : (
+                  <span className="text-[#D4A843] font-bold text-lg">
+                    {service.price.toLocaleString('en-EG')} EGP
+                  </span>
+                )}
                 <span className="text-sm text-slate-400">· {service.duration_minutes} min</span>
               </div>
               <div className="flex items-center gap-1 text-sm">
@@ -213,16 +166,18 @@ export function ServiceDrawer({ service, open, onClose, testimonials }: ServiceD
               </div>
             </div>
 
-            <div className="mb-5">
-              <h4 className="font-semibold text-slate-900 mb-1 text-sm">What to Expect</h4>
-              <p className="text-sm text-slate-600 leading-relaxed">{service.description_en}</p>
-            </div>
+            {service.description_en && (
+              <div className="mb-5">
+                <h4 className="font-semibold text-slate-900 mb-1 text-sm">What to Expect</h4>
+                <p className="text-sm text-slate-600 leading-relaxed">{service.description_en}</p>
+              </div>
+            )}
 
-            <div className="grid grid-cols-2 gap-3 mb-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
               <div className="bg-teal-50 rounded-xl p-3">
                 <h4 className="text-xs font-semibold text-teal-800 uppercase tracking-wider mb-1.5">Perfect For</h4>
                 <ul className="space-y-1">
-                  {content.perfectFor.map((item, i) => (
+                  {highlights.map((item, i) => (
                     <li key={i} className="text-xs text-teal-700 flex items-start gap-1.5">
                       <span className="text-teal-500 mt-0.5 shrink-0">✓</span>
                       {item}
@@ -233,7 +188,7 @@ export function ServiceDrawer({ service, open, onClose, testimonials }: ServiceD
               <div className="bg-amber-50 rounded-xl p-3">
                 <h4 className="text-xs font-semibold text-amber-800 uppercase tracking-wider mb-1.5">Good to Know</h4>
                 <ul className="space-y-1">
-                  {content.goodToKnow.map((item, i) => (
+                  {goodToKnow.map((item, i) => (
                     <li key={i} className="text-xs text-amber-700 flex items-start gap-1.5">
                       <span className="text-amber-500 mt-0.5 shrink-0">ℹ</span>
                       {item}
@@ -246,7 +201,7 @@ export function ServiceDrawer({ service, open, onClose, testimonials }: ServiceD
             <div className="mb-5">
               <h4 className="font-semibold text-slate-900 mb-2 text-sm">What&apos;s Included</h4>
               <div className="space-y-2">
-                {content.whatsIncluded.map((item, i) => (
+                {whatsIncluded.map((item, i) => (
                   <div key={i} className="flex items-center gap-2">
                     <div className="size-5 rounded-full bg-teal-100 flex items-center justify-center shrink-0">
                       <span className="text-teal-700 text-xs">✓</span>
@@ -257,33 +212,35 @@ export function ServiceDrawer({ service, open, onClose, testimonials }: ServiceD
               </div>
             </div>
 
-            <div className="mb-5">
-              <h4 className="font-semibold text-slate-900 mb-2 text-sm">Frequently Asked</h4>
-              <div className="space-y-1 border border-slate-200 rounded-xl overflow-hidden">
-                {content.faq.map((item, i) => (
-                  <div key={i} className="border-b border-slate-100 last:border-b-0">
-                    <button
-                      onClick={() => setFaqOpen(faqOpen === i ? null : i)}
-                      className="w-full flex items-center justify-between px-4 py-3 text-left text-sm font-medium text-slate-800 hover:bg-slate-50 transition"
-                    >
-                      {item.q}
-                      <span className={cn(
-                        'text-slate-400 transition-transform duration-200 shrink-0 ml-2',
-                        faqOpen === i && 'rotate-180'
+            {faqs.length > 0 && (
+              <div className="mb-5">
+                <h4 className="font-semibold text-slate-900 mb-2 text-sm">Frequently Asked</h4>
+                <div className="space-y-1 border border-slate-200 rounded-xl overflow-hidden">
+                  {faqs.map((item, i) => (
+                    <div key={i} className="border-b border-slate-100 last:border-b-0">
+                      <button
+                        onClick={() => setFaqOpen(faqOpen === i ? null : i)}
+                        className="w-full flex items-center justify-between px-4 py-3 text-left text-sm font-medium text-slate-800 hover:bg-slate-50 transition"
+                      >
+                        {item.q}
+                        <span className={cn(
+                          'text-slate-400 transition-transform duration-200 shrink-0 ml-2',
+                          faqOpen === i && 'rotate-180'
+                        )}>
+                          ▼
+                        </span>
+                      </button>
+                      <div className={cn(
+                        'overflow-hidden transition-all duration-200',
+                        faqOpen === i ? 'max-h-40' : 'max-h-0'
                       )}>
-                        ▼
-                      </span>
-                    </button>
-                    <div className={cn(
-                      'overflow-hidden transition-all duration-200',
-                      faqOpen === i ? 'max-h-40' : 'max-h-0'
-                    )}>
-                      <p className="px-4 pb-3 text-sm text-slate-500 leading-relaxed">{item.a}</p>
+                        <p className="px-4 pb-3 text-sm text-slate-500 leading-relaxed">{item.a}</p>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             {serviceTestimonials.length > 0 && (
               <div className="mb-5">
@@ -318,6 +275,11 @@ export function ServiceDrawer({ service, open, onClose, testimonials }: ServiceD
                 className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-[#0A6E74] to-[#065256] text-white font-bold py-3.5 rounded-xl text-sm hover:shadow-lg hover:shadow-teal-900/20 transition-all active:scale-[0.98]"
               >
                 Book This Session — {service.price.toLocaleString('en-EG')} EGP
+                {service.discount_percent && service.discount_percent > 0 && (
+                  <span className="text-[10px] bg-white/20 px-2 py-0.5 rounded-full">
+                    -{service.discount_percent}%
+                  </span>
+                )}
               </Link>
               <a
                 href="https://wa.me/201019382288"
